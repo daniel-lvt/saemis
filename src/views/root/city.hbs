@@ -1,0 +1,54 @@
+<div class="card">
+    <div class="accordion" id="accordionExample">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                        data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Añadir Ciudad
+                    </button>
+                </h2>
+            </div>
+
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div class="card-body">
+                    <form action="/root/city" method="POST">
+                        <div class="row">
+                            <div class="col-md-4 form-group">
+                                <input type="text" class="form-control" placeholder="nombre ciudad" name="city">
+                            </div>
+
+                            <div class="form-group">
+                                <button class="btn btn-success btn-block">Añadir Ciudad</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="p-4">
+        <h2>Ciudades</h2>
+        <table class="table" id="id_user_root">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre Ciudad</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {{#each city}}
+
+                <tr>
+                    <th scope="row">{{@key}}</th>
+                    <td>{{nombre_Ciudad}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>

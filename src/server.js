@@ -40,7 +40,11 @@ app.use(passport.session());
 app.use((req, res, next) => {
     app.locals.success = req.flash('success');
     app.locals.message = req.flash('message');
-    app.locals.user = req = req.user;
+    app.locals.user = req.user;
+    if (req.user != undefined) {
+        app.locals.usuario_root = req.user.tipo_usuario_root == 'root' ? true : false;
+        app.locals.usuario_admin = req.user.tipo_usuario_admin == 'admin' ? true : false;
+    }
     next();
 })
 

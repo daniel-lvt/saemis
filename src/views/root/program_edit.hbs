@@ -1,0 +1,54 @@
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="card ">
+                <div class="card-body">
+
+                    <h2 class="text-center pb-4">Actualizar Carrera</h2>
+
+                    {{#each data_edit}}
+
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario" placeholder="{{Nombre_carrera}}"
+                            disabled>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario"
+                            placeholder="{{Descripcion_carrera}}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario" placeholder="{{nombre_Ciudad}}"
+                            disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario" placeholder="{{tipo_jornada}}"
+                            disabled>
+                    </div>
+                    {{/each}}
+
+
+                    <form action="/root/program/edit/{{id}}" method="POST">
+                        {{#each data_edit}}
+                        <div class="form-group ">
+                            <p class="font-weight-light">Nombre Actual: <b>{{Nombre_carrera}}</b> </p>
+                            <input type="text" class="form-control" placeholder="nuevo nombre" name="new_name">
+                        </div>
+                        <div class="form-group">
+                            <p class="font-weight-light">Descripcion Actual: <b>{{Descripcion_carrera}}</b></p>
+                            <input type="text" class="form-control" placeholder="nueva descripcion"
+                                name="new_description">
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block">Guardar</button>
+                        </div>
+                        {{/each}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
