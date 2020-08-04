@@ -1,0 +1,14 @@
+select * from carrera LEFT JOIN usuario_admin ON carrera.idCarrera=usuario_admin.Carrera_idCarrera where usuario_admin.idUsuario_admin is NULL;
+
+select carrera.idCarrera,carrera.Nombre_carrera,c.nombre_Ciudad,j.tipo_jornada from ciudad c ,jornada j, carrera LEFT JOIN usuario_admin ON carrera.idCarrera=usuario_admin.Carrera_idCarrera where usuario_admin.idUsuario_admin is NULL and carrera.Ciudad_idCiudad = c.idCiudad and carrera.Jornada_idJornada=j.idJornada;
+
+
+id-sistemas-sogamoso-diurno
+
+SELECT ca.idCarrera,ca.Nombre_carrera,ca.Descripcion_carrera,ci.nombre_Ciudad,j.tipo_jornada from carrera ca,ciudad ci,jornada j where ca.Ciudad_idCiudad=ci.idCiudad and ca.Jornada_idJornada=j.idJornada
+
+
+INSERT INTO jornada(tipo_jornada)
+    values('diurna'),
+    	('nocturna');
+
