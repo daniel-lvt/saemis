@@ -1,0 +1,66 @@
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="card ">
+                <div class="card-body">
+
+                    <h2 class="text-center pb-4">Updated User</h2>
+
+                    {{#each dataEdit}}
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre" placeholder="{{Nombre_usuario}}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="codigo" placeholder="{{Codigo}}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario"
+                            placeholder="{{NombreUsuario_usuario}}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario" placeholder="{{Correo_usuario}}"
+                            disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario" placeholder="{{Nombre_carrera}}"
+                            disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario" placeholder="{{Nombre_tipo}}"
+                            disabled>
+                    </div>
+                    {{/each}}
+                    <form action="/admin/user/edit/{{id}}" method="POST">
+
+                        <div class="form-group ">
+                            <p class="font-weight-light">value to update: </p>
+                            <select class="custom-select mr-sm-2" name="option_tipo">
+                                {{#each dataDB_tipo}}
+                                <option id="{{idTipo}}">{{idTipo}}-{{Nombre_tipo}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <p class="font-weight-light">value to update: {{Nombre_carrera}}</p>
+                            <select class="custom-select mr-sm-2" name="option_carrera">
+                                {{#each dataDB_carrera}}
+                                <option id="{{idCarrera}}">{{idCarrera}}-{{Nombre_carrera}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block">SAVE</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{> footer}}

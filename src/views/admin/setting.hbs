@@ -1,0 +1,63 @@
+{{!-- falta crear la validacion y cambio con la base de datos y el redirect --}}
+
+<div class="accordion" id="accordionExample">
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                    data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Cambiar contraseña
+                </button>
+            </h2>
+        </div>
+
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div class="card-body">
+
+
+
+                <div class="container p-4">
+                    <div class="row">
+                        <div class="col-md-4 mx-auto">
+                            <div class="card ">
+                                <div class="card-body">
+                                    <form action="" method="POST">
+                                        {{!-- action es el lugar a donde se va a enviar la informacion --}}
+                                        <div class="form-group">
+                                            <input type="password" class="form-control" name="current_password"
+                                                placeholder="current password" autofocus>
+                                            {{!-- a traves de name le voy a decir como va a recibir el dato --}}
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" name="new_password" placeholder="new password" class="form-control">
+                                        </div>
+
+                                       <div class="form-group">
+                                            <input type="password" name="new_password_repeat" placeholder="repeat new password" class="form-control">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <button class="btn btn-success btn-block">CHANGE</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{{> footer}}

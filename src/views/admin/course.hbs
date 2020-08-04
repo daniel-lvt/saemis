@@ -1,0 +1,78 @@
+<div class="accordion" id="accordionExample">
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                    data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Add Curse
+                </button>
+            </h2>
+        </div>
+
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div class="card-body">
+
+                <div class="container p-4">
+                    <div class="row">
+                        <div class="col-md-4 mx-auto">
+                            <div class="card ">
+                                <div class="card-body">
+                                    <form action="/admin/course" method="POST">
+                                        <div class="form-group">
+                                            <textarea name="name" class="form-control" rows="2"
+                                                placeholder="Nombre Curso"></textarea>
+                                        </div>
+
+                                        <div class=" form-group">
+                                            <select class="custom-select mr-sm-2" name="option_carrera">
+                                                {{#each dataDB_teachers}}
+                                                <option id="{{Codigo}}">{{Codigo}}-{{Nombre_usuario}}</option>
+                                                {{/each}}
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="grupo" placeholder="grupo"
+                                                autofocus>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <button class="btn btn-success btn-block">SAVE</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="headingTwo">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+                    data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    List Courses
+                </button>
+            </h2>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="form-group">
+
+                    {{!-- contenido para listar cursos --}}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{{> footer}}
