@@ -21,8 +21,10 @@ router.get('/setting', (req, res) => {
 
 router.get('/user', async(req, res) => {
     const programas = await pool.query('select carrera.idCarrera,carrera.Nombre_carrera,c.nombre_Ciudad,j.tipo_jornada from ciudad as c ,jornada j, carrera LEFT JOIN usuario_admin ON carrera.idCarrera=usuario_admin.Carrera_idCarrera where usuario_admin.idUsuario_admin is NULL and carrera.Ciudad_idCiudad = c.idCiudad and carrera.Jornada_idJornada=j.idJornada');
+    const user_table = await pool.query('select ua.idUsuario_admin, ua.Nombre_Usuario_admin, ua.correo, ua.tipo_usuario_admin, c.Nombre_carrera,cd.nombre_Ciudad,j.tipo_jornada from usuario_admin ua, carrera c, ciudad cd, jornada j where ua.Carrera_idCarrera = c.idCarrera and cd.idCiudad=c.Ciudad_idCiudad and c.Jornada_idJornada=j.idJornada');
     res.render('./root/user', {
-        programas
+        programas,
+        user_table
     });
 });
 router.get('/program', async(req, res) => {
@@ -51,6 +53,14 @@ router.get('/program/delete/:id', async(req, res) => {
     req.flash('success', `Se ha eliminado satisfactoriamente ${d[0].Descripcion_carrera} de la base de datos`)
     res.redirect('/root/program');
 });
+
+router.get('/user/delete/:id', async(req, res) => {
+    const { id } = req.params;
+    const d = await pool.query('DELETE FROM usuario_admin where idUsuario_admin = ?', [id]);
+    req.flash('success', `Se ha eliminado satisfactoriamente el usuario de la base de datos`)
+    res.redirect('/root/user');
+});
+
 
 router.post('/password', async(req, res) => {
     const { current_password, new_password, new_password_repeat } = req.body;
@@ -84,11 +94,24 @@ router.post('/password', async(req, res) => {
     }
 });
 
-router.post('/user/add', passport.authenticate('local.signup.admin', {
-    successRedirect: '/root/user',
-    failureRedirect: '/root/user',
-    failureFlash: true
-}));
+
+router.post('/user/add', async(req, res) => {
+    const { option_carrera, mail, code } = req.body;
+    const carrera_info = option_carrera.split('-');
+    const usuario = mail.split('@')[0];
+    const newUser = {
+        idUsuario_admin: 'a-' + code,
+        Nombre_Usuario_admin: usuario,
+        Contrasena_Usuario_admin: usuario + code,
+        correo: mail,
+        tipo_usuario_admin: 'admin',
+        Carrera_idCarrera: Number(carrera_info[0])
+    };
+    newUser.Contrasena_Usuario_admin = await helpers.encryptPassword(newUser.Contrasena_Usuario_admin);
+    const data = await pool.query('INSERT INTO usuario_admin SET ?', [newUser]);
+    req.flash('success', `Ha sido agregado un usuario administrador para ${carrera_info[1]}`);
+    res.redirect('/root/user');
+});
 
 router.post('/program/edit/:id', async(req, res) => {
     const { id } = req.params;

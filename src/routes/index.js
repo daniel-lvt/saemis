@@ -29,8 +29,12 @@ router.post('/signin', (req, res) => {
 
 });
 
-router.post('/admin/signin', (req, res) => {
-
+router.post('/admin/signin', (req, res, next) => {
+    passport.authenticate('local.signin.admin', {
+        successRedirect: '/admin/',
+        failureRedirect: '/admin/signin',
+        failureFlash: true
+    })(req, res, next);
 });
 
 router.post('/root/signin', (req, res, next) => {

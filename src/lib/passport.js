@@ -19,9 +19,7 @@ passport.use('local.signup.root', new LocalStrategy({
     };
     newUser.contrasena_usuario_root = await helpers.encryptPassword(password);
     const result = await pool.query('INSERT INTO usuario_root SET?', [newUser]);
-    //newUser.idUsuario_root = result.insertId;
     return done(null, newUser);
-    console.log(newUser)
 }));
 
 passport.use('local.signin.root', new LocalStrategy({
@@ -45,26 +43,6 @@ passport.use('local.signin.root', new LocalStrategy({
 
 
 // Admin
-
-passport.use('local.signup.admin', new LocalStrategy({
-    passReqToCallback: true
-}, async(req, done) => {
-    const { option_carrera, mail, code } = req.body;
-
-    // const nombre_usuario;
-
-    const newUser = {
-        idUsuario_admin: 'a-' + code,
-        nombre_usuario_root: username,
-        contrasena_usuario_root: password,
-        tipo_usuario_root: 'root'
-    };
-    newUser.contrasena_usuario_root = await helpers.encryptPassword(password);
-    const result = await pool.query('INSERT INTO usuario_root SET?', [newUser]);
-    //newUser.idUsuario_root = result.insertId;
-    return done(null, newUser);
-    console.log(newUser)
-}));
 
 passport.use('local.signin.admin', new LocalStrategy({
     usernameField: 'username',
@@ -108,7 +86,8 @@ passport.deserializeUser(async(id, done) => {
         const rows = await pool.query('SELECT * FROM usuario_root WHERE idUsuario_root = ?', [id]);
         done(null, rows[0]);
     } else if (id.split('')[0] === 'a') {
-
+        const rows = await pool.query('SELECT * FROM usuario_admin WHERE idUsuario_admin =?', [id]);
+        done(null, rows[0]);
     }
 });
 
@@ -121,3 +100,14 @@ let fk_root = () => {
     }
     return result;
 };
+
+let validate_nombre = (entrada) => {
+    let info = entrada[1]
+    let e = new Number(info[info.length - 2]);
+    if (e >= 0) {
+        let retorno = info.slice(0, info.length - 2);
+        return retorno;
+    } else {
+        return info;
+    }
+}
