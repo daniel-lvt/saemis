@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/database');
+const helpers = require('../lib/helpers');
+const passport = require('passport');
 
 router.get('/', (req, res) => {
     res.render('root/root');
@@ -13,8 +15,15 @@ router.get('/city', async(req, res) => {
     });
 });
 
-router.get('/user', (req, res) => {
-    res.render('./root/user');
+router.get('/setting', (req, res) => {
+    res.render('./root/setting');
+});
+
+router.get('/user', async(req, res) => {
+    const programas = await pool.query('select carrera.idCarrera,carrera.Nombre_carrera,c.nombre_Ciudad,j.tipo_jornada from ciudad as c ,jornada j, carrera LEFT JOIN usuario_admin ON carrera.idCarrera=usuario_admin.Carrera_idCarrera where usuario_admin.idUsuario_admin is NULL and carrera.Ciudad_idCiudad = c.idCiudad and carrera.Jornada_idJornada=j.idJornada');
+    res.render('./root/user', {
+        programas
+    });
 });
 router.get('/program', async(req, res) => {
     const jornada = await pool.query("SELECT * FROM jornada");
@@ -43,6 +52,44 @@ router.get('/program/delete/:id', async(req, res) => {
     res.redirect('/root/program');
 });
 
+router.post('/password', async(req, res) => {
+    const { current_password, new_password, new_password_repeat } = req.body;
+    if (new_password === new_password_repeat) {
+        const user = req.session.passport.user;
+        const rows = await pool.query('SELECT * FROM usuario_root where idUsuario_root = ?', [user]);
+        if (rows.length > 0) {
+            const data = rows[0];
+            const validPassword = await helpers.mathPassword(current_password, data.contrasena_usuario_root);
+            if (validPassword) {
+                const encryp = await helpers.encryptPassword(new_password);
+                console.log('-------------------');
+                console.log(validPassword)
+                console.log('-------------------');
+                console.log(rows[0])
+                console.log('-------------------');
+                console.log(encryp)
+                console.log('-------------------');
+                // const data = await pool.query(`UPDATE usuario_root SET contrasena_usuario_root=${encryp} WHERE idUsuario_root='${user}'`);
+                req.flash('success', 'la contraseña ha sido actualizada');
+                res.redirect('/root/setting');
+            } else {
+                req.flash('success', 'la actual no es valida por favor ingrese de nuevo los datos');
+                res.redirect('/root/setting');
+            }
+
+        }
+    } else {
+        req.flash('message', 'los valores en torno a la nueva contraseña no concuerdan, por favor ingrese la informacion de nuevo');
+        res.redirect('/root/setting');
+    }
+});
+
+router.post('/user/add', passport.authenticate('local.signup.admin', {
+    successRedirect: '/root/user',
+    failureRedirect: '/root/user',
+    failureFlash: true
+}));
+
 router.post('/program/edit/:id', async(req, res) => {
     const { id } = req.params;
     const { new_name, new_description } = req.body;
@@ -50,7 +97,6 @@ router.post('/program/edit/:id', async(req, res) => {
     req.flash('success', `La informacion ha sido actualizada satisfactoriamente para ${new_name}`)
     res.redirect('/root/program');
 });
-
 
 
 router.post('/program/add', async(req, res) => {

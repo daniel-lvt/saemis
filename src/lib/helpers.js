@@ -15,5 +15,4 @@ helpers.mathPassword = async(password, savedPassword) => {
     }
 };
 
-
 module.exports = helpers;

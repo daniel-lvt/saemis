@@ -12,22 +12,13 @@
 
             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
                 <div class="card-body">
-                    <form action="/admin/user/add" method="POST">
+                    <form action="/root/user/add" method="POST">
                         <div class="row">
-                            <div class="col form-group">
-
-                                <select class="custom-select mr-sm-2" name="option_tipo">
-                                    {{#each dataDB_tipo}}
-                                    <option id="{{idTipo}}">{{idTipo}}-{{Nombre_tipo}}</option>
-                                    {{/each}}
-
-                                </select>
-                            </div>
 
                             <div class="col form-group">
                                 <select class="custom-select mr-sm-2" name="option_carrera">
-                                    {{#each dataDB_carrera}}
-                                    <option id="{{idCarrera}}">{{idCarrera}}-{{Nombre_carrera}}</option>
+                                    {{#each programas}}
+                                    <option id="{{idCarrera}}">{{idCarrera}}-{{Nombre_carrera}}-{{nombre_Ciudad}}-{{tipo_jornada}}</option>
                                     {{/each}}
                                 </select>
                             </div>
@@ -98,6 +89,5 @@
     </div>
 
 </div>
-
 
 {{> footer}}

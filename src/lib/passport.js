@@ -45,6 +45,27 @@ passport.use('local.signin.root', new LocalStrategy({
 
 
 // Admin
+
+passport.use('local.signup.admin', new LocalStrategy({
+    passReqToCallback: true
+}, async(req, done) => {
+    const { option_carrera, mail, code } = req.body;
+
+    // const nombre_usuario;
+
+    const newUser = {
+        idUsuario_admin: 'a-' + code,
+        nombre_usuario_root: username,
+        contrasena_usuario_root: password,
+        tipo_usuario_root: 'root'
+    };
+    newUser.contrasena_usuario_root = await helpers.encryptPassword(password);
+    const result = await pool.query('INSERT INTO usuario_root SET?', [newUser]);
+    //newUser.idUsuario_root = result.insertId;
+    return done(null, newUser);
+    console.log(newUser)
+}));
+
 passport.use('local.signin.admin', new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password',
@@ -67,7 +88,6 @@ passport.use('local.signin.admin', new LocalStrategy({
 // Usuario
 
 
-
 passport.serializeUser((user, done) => {
     if (user.tipo_usuario_root != undefined) {
         console.log('es un usuario root');
@@ -85,7 +105,6 @@ passport.deserializeUser(async(id, done) => {
     if (id.length === undefined) {
 
     } else if (id.split('')[0] === 'r') {
-        console.log('descerealizacion de un usuario root')
         const rows = await pool.query('SELECT * FROM usuario_root WHERE idUsuario_root = ?', [id]);
         done(null, rows[0]);
     } else if (id.split('')[0] === 'a') {
@@ -95,16 +114,6 @@ passport.deserializeUser(async(id, done) => {
 
 let fk_root = () => {
     let result = 'r-';
-    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let charactersLength = characters.length;
-    for (let i = 0; i < 8; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-};
-
-let fk_admin = () => {
-    let result = 'a-';
     let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let charactersLength = characters.length;
     for (let i = 0; i < 8; i++) {

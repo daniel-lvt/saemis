@@ -21,7 +21,6 @@ router.get('/root/signin', (req, res) => {
 
 router.get('/logout', (req, res) => {
     req.logOut();
-    req.flash('message', "session finaliced");
     req.session.destroy();
     res.redirect('/');
 });
