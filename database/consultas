@@ -12,3 +12,6 @@ INSERT INTO jornada(tipo_jornada)
     values('diurna'),
     	('nocturna');
 
+INSERT INTO tipo(idTipo,Nombre_tipo)
+values (1,'estudiante'),
+        (2,'docente');

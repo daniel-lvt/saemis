@@ -68,20 +68,17 @@ passport.use('local.signin.admin', new LocalStrategy({
 
 passport.serializeUser((user, done) => {
     if (user.tipo_usuario_root != undefined) {
-        console.log('es un usuario root');
         done(null, user.idUsuario_root);
     } else if (user.tipo_usuario_admin != undefined) {
-        console.log('es un usuario admin');
         done(null, user.idUsuario_admin);
     } else {
-        console.log('es un usuario usuario')
         done(null, user.Codigo);
     }
 });
 
 passport.deserializeUser(async(id, done) => {
     if (id.length === undefined) {
-
+        console.log('usuario normal');
     } else if (id.split('')[0] === 'r') {
         const rows = await pool.query('SELECT * FROM usuario_root WHERE idUsuario_root = ?', [id]);
         done(null, rows[0]);
@@ -100,14 +97,3 @@ let fk_root = () => {
     }
     return result;
 };
-
-let validate_nombre = (entrada) => {
-    let info = entrada[1]
-    let e = new Number(info[info.length - 2]);
-    if (e >= 0) {
-        let retorno = info.slice(0, info.length - 2);
-        return retorno;
-    } else {
-        return info;
-    }
-}

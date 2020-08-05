@@ -25,9 +25,9 @@ app.set('view engine', '.hbs');
 
 app.use(session({
     secret: 'datass',
+    store: new MySQLStore(database),
     resave: false,
-    saveUninitialized: false,
-    store: new MySQLStore(database)
+    saveUninitialized: false
 }));
 
 app.use(flash());
