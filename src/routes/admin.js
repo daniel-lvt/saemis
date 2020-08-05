@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require('../db/database');
 const passport = require('passport');
 const { encryptPassword, matchPassword } = require('../lib/helpers');
+const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 const helpers = require('../lib/helpers');
 /*
 queda pendiente 
@@ -24,7 +25,7 @@ queda pendiente
 */
 //functions get
 
-router.get('/', async(req, res) => {
+router.get('/', isloggedIn, async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
     const db_carrera = await pool.query('select idCarrera,Nombre_carrera,Descripcion_carrera from carrera where idCarrera = ?', [carrera]);
     const { idCarrera, Nombre_carrera, Descripcion_carrera } = db_carrera[0];
@@ -36,7 +37,7 @@ router.get('/', async(req, res) => {
     });
 });
 
-router.get('/user', async(req, res) => {
+router.get('/user', isloggedIn, async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
     const dataDB_tipo = await pool.query('SELECT * FROM tipo');
     const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =?', [carrera])
@@ -53,21 +54,21 @@ router.get('/user', async(req, res) => {
 
 
 //mirar como trabajar luego
-router.get('/course', async(req, res) => {
-    const dataDB_tipo = await pool.query('SELECT * FROM tipo');
-    const dataDB_carrera = await pool.query('SELECT * FROM carrera');
-    const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo')
-    const dataDB_teachers = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and Nombre_tipo='docente'`);
+router.get('/course', isloggedIn, async(req, res) => {
+    // const dataDB_tipo = await pool.query('SELECT * FROM tipo');
+    // const dataDB_carrera = await pool.query('SELECT * FROM carrera');
+    // const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo')
+    // const dataDB_teachers = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and Nombre_tipo='docente'`);
 
     res.render('./admin/course', {
-        dataDB_carrera,
-        dataDB_tipo,
-        dataDB_usuarios,
-        dataDB_teachers
+        // dataDB_carrera,
+        // dataDB_tipo,
+        // dataDB_usuarios,
+        // dataDB_teachers
     });
 });
 
-router.get('/data', async(req, res) => {
+router.get('/data', isloggedIn, async(req, res) => {
     // revisar si toda la informacion de las consultas es necesaria
     const dataDB_tipo = await pool.query('SELECT * FROM tipo');
     const dataDB_carrera = await pool.query('SELECT * FROM carrera');
@@ -80,12 +81,12 @@ router.get('/data', async(req, res) => {
     });
 });
 
-router.get('/setting', async(req, res) => {
+router.get('/setting', isloggedIn, async(req, res) => {
     res.render('./admin/setting');
 });
 
 
-router.get('/user/edit/:id', async(req, res) => {
+router.get('/user/edit/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const dataEdit = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and u.Codigo=${id}`)
     const dataDB_tipo = await pool.query('SELECT * FROM tipo');
@@ -99,7 +100,7 @@ router.get('/user/edit/:id', async(req, res) => {
     });
 });
 
-router.get('/user/delete/:id', async(req, res) => {
+router.get('/user/delete/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const d = await pool.query(`SELECT *FROM usuario WHERE Codigo=${id}`);
     const del = await pool.query(`DELETE FROM usuario WHERE Codigo=${id}`);
@@ -109,12 +110,25 @@ router.get('/user/delete/:id', async(req, res) => {
 
 // functions post
 
-router.post('/course', (req, res) => {
+router.post('/course/add', isloggedIn, async(req, res) => {
+    //verificar que la informacion sea la necesaria
+    // trabajo trabajo, cambios db
+    const carrera = req.user.Carrera_idCarrera;
+    const { name, grupo } = req.body;
+
+    const newCurse = {
+        Nombre_materia: name,
+        Grupo_materia: grupo,
+        Carrera_idCarrera: carrera
+    }
+
+    const data = await pool.query
     console.log(req.body)
+
 });
 
 
-router.post('/user/edit/:id', async(req, res) => {
+router.post('/user/edit/:id', isloggedIn, async(req, res) => {
     const { option_tipo } = req.body;
     const { id } = req.params;
     const option_change_tipo = option_tipo.split('-')[0];
@@ -130,7 +144,7 @@ router.post('/user/edit/:id', async(req, res) => {
     }
 });
 
-router.post('/user/add', async(req, res, next) => {
+router.post('/user/add', isloggedIn, async(req, res, next) => {
     const { option_tipo, option_carrera, mail, code } = req.body;
     const usuario = mail.split('@')[0];
     const busqueda = usuario.split('.');
@@ -163,5 +177,29 @@ router.post('/user/add', async(req, res, next) => {
     res.redirect('/admin/user');
 });
 
+router.post('/password', isloggedIn, async(req, res) => {
+    console.log('entro')
+    const { current_password, new_password, new_password_repeat } = req.body;
+    if (new_password === new_password_repeat) {
+        const user = req.session.passport.user;
+        const rows = await pool.query('SELECT * FROM usuario_admin where idUsuario_admin = ?', [user]);
+        if (rows.length > 0) {
+            const data = rows[0];
+            const validPassword = await helpers.mathPassword(current_password, data.Contrasena_Usuario_admin);
+            if (validPassword) {
+                const encryp = await helpers.encryptPassword(new_password);
+                const data = await pool.query(`UPDATE usuario_admin SET Contrasena_Usuario_admin='${encryp}' WHERE idUsuario_admin="${user}"`);
+                req.flash('success', 'la contraseña ha sido actualizada');
+                res.redirect('/admin/setting');
+            } else {
+                req.flash('success', 'la contraseña digitada no es valida por favor ingrese de nuevo los datos');
+                res.redirect('/admin/setting');
+            }
+        }
+    } else {
+        req.flash('message', 'los valores en torno a la nueva contraseña no concuerdan, por favor ingrese la informacion de nuevo');
+        res.redirect('/admin/setting');
+    }
+});
 
 module.exports = router;

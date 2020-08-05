@@ -3,23 +3,24 @@ const router = express.Router();
 const pool = require('../db/database');
 const helpers = require('../lib/helpers');
 const passport = require('passport');
+const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 
-router.get('/', (req, res) => {
+router.get('/', isloggedIn, (req, res) => {
     res.render('root/root');
 });
 
-router.get('/city', async(req, res) => {
+router.get('/city', isloggedIn, async(req, res) => {
     const city = await pool.query('SELECT * FROM ciudad');
     res.render('./root/city', {
         city
     });
 });
 
-router.get('/setting', (req, res) => {
+router.get('/setting', isloggedIn, (req, res) => {
     res.render('./root/setting');
 });
 
-router.get('/user', async(req, res) => {
+router.get('/user', isloggedIn, async(req, res) => {
     const programas = await pool.query('select carrera.idCarrera,carrera.Nombre_carrera,c.nombre_Ciudad,j.tipo_jornada from ciudad as c ,jornada j, carrera LEFT JOIN usuario_admin ON carrera.idCarrera=usuario_admin.Carrera_idCarrera where usuario_admin.idUsuario_admin is NULL and carrera.Ciudad_idCiudad = c.idCiudad and carrera.Jornada_idJornada=j.idJornada');
     const user_table = await pool.query('select ua.idUsuario_admin, ua.Nombre_Usuario_admin, ua.correo, ua.tipo_usuario_admin, c.Nombre_carrera,cd.nombre_Ciudad,j.tipo_jornada from usuario_admin ua, carrera c, ciudad cd, jornada j where ua.Carrera_idCarrera = c.idCarrera and cd.idCiudad=c.Ciudad_idCiudad and c.Jornada_idJornada=j.idJornada');
     res.render('./root/user', {
@@ -27,7 +28,7 @@ router.get('/user', async(req, res) => {
         user_table
     });
 });
-router.get('/program', async(req, res) => {
+router.get('/program', isloggedIn, async(req, res) => {
     const jornada = await pool.query("SELECT * FROM jornada");
     const ciudad = await pool.query("SELECT * FROM ciudad")
     const carrera = await pool.query("SELECT ca.idCarrera,ca.Nombre_carrera,ca.Descripcion_carrera,ci.nombre_Ciudad,j.tipo_jornada from carrera ca,ciudad ci,jornada j where ca.Ciudad_idCiudad=ci.idCiudad and ca.Jornada_idJornada=j.idJornada");
@@ -37,7 +38,7 @@ router.get('/program', async(req, res) => {
         carrera
     });
 });
-router.get('/program/edit/:id', async(req, res) => {
+router.get('/program/edit/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const data_edit = await pool.query("SELECT ca.idCarrera,ca.Nombre_carrera,ca.Descripcion_carrera,ci.nombre_Ciudad,j.tipo_jornada from carrera ca,ciudad ci,jornada j where ca.Ciudad_idCiudad=ci.idCiudad and ca.Jornada_idJornada=j.idJornada and ca.idCarrera=?", [id]);
     res.render('./root/program_edit', {
@@ -46,7 +47,7 @@ router.get('/program/edit/:id', async(req, res) => {
     });
 });
 
-router.get('/program/delete/:id', async(req, res) => {
+router.get('/program/delete/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const d = await pool.query('SELECT * FROM carrera where idCarrera=?', [id]);
     const del = await pool.query('DELETE FROM carrera where idCarrera=?', [id])
@@ -54,15 +55,14 @@ router.get('/program/delete/:id', async(req, res) => {
     res.redirect('/root/program');
 });
 
-router.get('/user/delete/:id', async(req, res) => {
+router.get('/user/delete/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const d = await pool.query('DELETE FROM usuario_admin where idUsuario_admin = ?', [id]);
     req.flash('success', `Se ha eliminado satisfactoriamente el usuario de la base de datos`)
     res.redirect('/root/user');
 });
 
-
-router.post('/password', async(req, res) => {
+router.post('/password', isloggedIn, async(req, res) => {
     const { current_password, new_password, new_password_repeat } = req.body;
     if (new_password === new_password_repeat) {
         const user = req.session.passport.user;
@@ -72,21 +72,13 @@ router.post('/password', async(req, res) => {
             const validPassword = await helpers.mathPassword(current_password, data.contrasena_usuario_root);
             if (validPassword) {
                 const encryp = await helpers.encryptPassword(new_password);
-                console.log('-------------------');
-                console.log(validPassword)
-                console.log('-------------------');
-                console.log(rows[0])
-                console.log('-------------------');
-                console.log(encryp)
-                console.log('-------------------');
-                // const data = await pool.query(`UPDATE usuario_root SET contrasena_usuario_root=${encryp} WHERE idUsuario_root='${user}'`);
+                const data = await pool.query(`UPDATE usuario_root SET contrasena_usuario_root='${encryp}' WHERE idUsuario_root="${user}"`);
                 req.flash('success', 'la contraseña ha sido actualizada');
                 res.redirect('/root/setting');
             } else {
-                req.flash('success', 'la actual no es valida por favor ingrese de nuevo los datos');
+                req.flash('success', 'la contraseña digitada no es valida por favor ingrese de nuevo los datos');
                 res.redirect('/root/setting');
             }
-
         }
     } else {
         req.flash('message', 'los valores en torno a la nueva contraseña no concuerdan, por favor ingrese la informacion de nuevo');
@@ -95,7 +87,7 @@ router.post('/password', async(req, res) => {
 });
 
 
-router.post('/user/add', async(req, res) => {
+router.post('/user/add', isloggedIn, async(req, res) => {
     const { option_carrera, mail, code } = req.body;
     const carrera_info = option_carrera.split('-');
     const usuario = mail.split('@')[0];
@@ -113,7 +105,7 @@ router.post('/user/add', async(req, res) => {
     res.redirect('/root/user');
 });
 
-router.post('/program/edit/:id', async(req, res) => {
+router.post('/program/edit/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const { new_name, new_description } = req.body;
     const data = await pool.query(`UPDATE carrera SET Nombre_carrera='${new_name}',Descripcion_carrera='${new_description}' WHERE idCarrera=${id}`);
@@ -122,7 +114,7 @@ router.post('/program/edit/:id', async(req, res) => {
 });
 
 
-router.post('/program/add', async(req, res) => {
+router.post('/program/add', isloggedIn, async(req, res) => {
     console.log(req.body)
     const { option_tipo, option_carrera, corto, descripcion } = req.body;
     const carrera = {
@@ -136,7 +128,7 @@ router.post('/program/add', async(req, res) => {
     res.redirect('/root/program')
 });
 
-router.post('/city', async(req, res) => {
+router.post('/city', isloggedIn, async(req, res) => {
     const { city } = req.body;
     const newCity = {
         nombre_Ciudad: city

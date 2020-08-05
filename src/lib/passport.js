@@ -25,7 +25,7 @@ passport.use('local.signup.root', new LocalStrategy({
 passport.use('local.signin.root', new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password',
-    passReqToCallback: true
+    passReqToCallback: true,
 }, async(req, username, password, done) => {
     const rows = await pool.query('SELECT * FROM usuario_root WHERE nombre_usuario_root = ?', [username]);
     if (rows.length > 0) {
