@@ -4,15 +4,14 @@
             <h2 class="mb-0">
                 <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
                     data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Add Curse
+                    Añadir Curso
                 </button>
             </h2>
         </div>
-
         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
             <div class="card-body">
 
-                <div class="container p-4">
+                <div class="container p-2">
                     <div class="row">
                         <div class="col-md-4 mx-auto">
                             <div class="card ">
@@ -41,28 +40,44 @@
             </div>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header" id="headingTwo">
-            <h2 class="mb-0">
-                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
-                    data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    List Courses
-                </button>
-            </h2>
-        </div>
-        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-            <div class="card-body">
-                <div class="form-group">
-
-                    {{!-- contenido para listar cursos --}}
-
-                </div>
-
-            </div>
-        </div>
+    <div class="p-4">
+        <h2>Cursos</h2>
+        <table class="table" id="id_user_admin">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col"></th>
+                    <th scope="col">Nombre Curso</th>
+                    <th scope="col">Grupo</th>
+                    <th scope="col">Configuracion Curso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each dataDB_course}}
+                <tr>
+                    <th scope="row">{{@key}}</th>
+                    <td>
+                        <div class="row">
+                            <div class="input.group-text pr-2">
+                                <a href="/admin/course/delete/{{idMateria}}"><img src="/img/icons/delete.png"></a>
+                            </div>
+                            <div class="input.group-text">
+                                <a href="/admin/course/edit/{{idMateria}}"><img src="/img/icons/edit.png"></a>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{Nombre_materia}}</td>
+                    <td>{{Grupo_materia}}</td>
+                    <td>
+                        <div class="input group-text">
+                            <a href="/admin/course/setting/{{idMateria}}"><img src="/img/icons/setting.png" alt=""></a>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
     </div>
 
-</div>
 
-
-{{> footer}}
+    {{> footer}}

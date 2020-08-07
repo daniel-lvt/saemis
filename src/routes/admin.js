@@ -1,35 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/database');
-const passport = require('passport');
-const { encryptPassword, matchPassword } = require('../lib/helpers');
 const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 const helpers = require('../lib/helpers');
-/*
-queda pendiente 
-    pendiente
-        usuario
-            crud
-                validacion y verificacion de datos 
-                informacion que se recibe de la pagina => validar
-                informacion que llega del servidor => validar
-                redireccion y finalizacion de sesion cuando se cree el acceso
-        curso
-            crud
-        data
-            generar reporte pdf
-            cargar contenido en masa de usuarios
-        setting
-            validar cambio de contraseña cuando se realice el login
-        
-*/
-//functions get
 
 router.get('/', isloggedIn, async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
     const db_carrera = await pool.query('select idCarrera,Nombre_carrera,Descripcion_carrera from carrera where idCarrera = ?', [carrera]);
     const { idCarrera, Nombre_carrera, Descripcion_carrera } = db_carrera[0];
-
     res.render('./admin/admin', {
         idCarrera,
         Nombre_carrera,
@@ -43,39 +21,9 @@ router.get('/user', isloggedIn, async(req, res) => {
     const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =?', [carrera])
     const db_carrera = await pool.query('select idCarrera,Nombre_carrera,Descripcion_carrera from carrera where idCarrera = ?', [carrera]);
     const { idCarrera, Nombre_carrera } = db_carrera[0];
-
     res.render('./admin/user', {
         idCarrera,
         Nombre_carrera,
-        dataDB_tipo,
-        dataDB_usuarios
-    });
-});
-
-
-//mirar como trabajar luego
-router.get('/course', isloggedIn, async(req, res) => {
-    // const dataDB_tipo = await pool.query('SELECT * FROM tipo');
-    // const dataDB_carrera = await pool.query('SELECT * FROM carrera');
-    // const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo')
-    // const dataDB_teachers = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and Nombre_tipo='docente'`);
-
-    res.render('./admin/course', {
-        // dataDB_carrera,
-        // dataDB_tipo,
-        // dataDB_usuarios,
-        // dataDB_teachers
-    });
-});
-
-router.get('/data', isloggedIn, async(req, res) => {
-    // revisar si toda la informacion de las consultas es necesaria
-    const dataDB_tipo = await pool.query('SELECT * FROM tipo');
-    const dataDB_carrera = await pool.query('SELECT * FROM carrera');
-    const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo')
-
-    res.render('./admin/data', {
-        dataDB_carrera,
         dataDB_tipo,
         dataDB_usuarios
     });
@@ -85,13 +33,11 @@ router.get('/setting', isloggedIn, async(req, res) => {
     res.render('./admin/setting');
 });
 
-
 router.get('/user/edit/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const dataEdit = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and u.Codigo=${id}`)
     const dataDB_tipo = await pool.query('SELECT * FROM tipo');
     const dataDB_carrera = await pool.query('SELECT * FROM carrera');
-
     res.render('./admin/user_edit', {
         dataEdit,
         dataDB_tipo,
@@ -108,25 +54,18 @@ router.get('/user/delete/:id', isloggedIn, async(req, res) => {
     res.redirect('/admin/user');
 });
 
-// functions post
-
 router.post('/course/add', isloggedIn, async(req, res) => {
-    //verificar que la informacion sea la necesaria
-    // trabajo trabajo, cambios db
     const carrera = req.user.Carrera_idCarrera;
     const { name, grupo } = req.body;
-
     const newCurse = {
         Nombre_materia: name,
         Grupo_materia: grupo,
         Carrera_idCarrera: carrera
     }
-
-    const data = await pool.query
-    console.log(req.body)
-
+    const data = await pool.query('INSERT INTO materia set?', [newCurse]);
+    req.flash('success', `Ha sido agregado el curso de ${name}`);
+    res.redirect('/admin/course');
 });
-
 
 router.post('/user/edit/:id', isloggedIn, async(req, res) => {
     const { option_tipo } = req.body;
@@ -142,6 +81,14 @@ router.post('/user/edit/:id', isloggedIn, async(req, res) => {
         req.flash('success', 'Se ha actualizado el tipo satisfactoriamente');
         res.redirect('/admin/user');
     }
+});
+
+router.get('/course', isloggedIn, async(req, res) => {
+    const carrera = req.user.Carrera_idCarrera;
+    const dataDB_course = await pool.query('Select * from materia where Carrera_idCarrera = ?', [carrera]);
+    res.render('./admin/course', {
+        dataDB_course
+    });
 });
 
 router.post('/user/add', isloggedIn, async(req, res, next) => {
@@ -200,6 +147,65 @@ router.post('/password', isloggedIn, async(req, res) => {
         req.flash('message', 'los valores en torno a la nueva contraseña no concuerdan, por favor ingrese la informacion de nuevo');
         res.redirect('/admin/setting');
     }
+});
+
+router.get('/course/delete/:id', async(req, res) => {
+    const { id } = req.params;
+    const name = await pool.query('SELECT Nombre_materia,Grupo_materia from materia WHERE idMateria = ?', [id]);
+    const data = await pool.query('DELETE FROM materia WHERE idMateria = ?', [id]);
+    req.flash('success', `Se ha eliminado ${name[0].Nombre_materia} con grupo ${name[0].Grupo_materia} satisfactoriamente`);
+    res.redirect('/admin/course');
+});
+
+// -----------------------------------proceso-------------------------------------------
+
+
+router.get('/course/edit/:id', async(req, res) => {
+    const { id } = req.params;
+    const data = await pool.query('SELECT * FROM materia WHERE idMateria = ? ', [id]);
+    res.render('./admin/course_edit', {
+        data
+    });
+});
+
+
+router.post('/course/edit/:id', async(req, res) => {
+    const { id } = req.params;
+    const { name, group } = req.body;
+    const data = await pool.query('SELECT * FROM materia WHERE idMateria = ? ', [id]);
+
+    if (data[0].Nombre_materia != name && data[0].Grupo_materia != group) {
+        //actualiza los dos
+    } else if (data[0].Nombre_materia == name && data[0].Grupo_materia != group) {
+        //actualiza grupo
+    } else if (data[0].Nombre_materia != name && data[0].Grupo_materia == group) {
+        //actualiza nombre
+    }
+    console.log(data[0])
+    res.redirect('/admin/course');
+});
+
+
+
+router.get('/course/setting/:id', async(req, res) => {
+    const { id } = req.params;
+
+    res.render('./admin/setting')
+});
+
+
+router.get('/data', isloggedIn, async(req, res) => {
+    // revisar si toda la informacion de las consultas es necesaria
+    // consultar con modulos que mas informacion debemos de proporcionar en data
+    const dataDB_tipo = await pool.query('SELECT * FROM tipo');
+    const dataDB_carrera = await pool.query('SELECT * FROM carrera');
+    const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo')
+
+    res.render('./admin/data', {
+        dataDB_carrera,
+        dataDB_tipo,
+        dataDB_usuarios
+    });
 });
 
 module.exports = router;

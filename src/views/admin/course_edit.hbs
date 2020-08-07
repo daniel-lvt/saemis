@@ -1,0 +1,46 @@
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="card ">
+                <div class="card-body">
+
+                    <h2 class="text-center pb-4">Actualizar Curso</h2>
+
+                    {{#each data}}
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario" placeholder="{{Nombre_materia}}"
+                            disabled>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nombre_usuario"
+                            placeholder="{{Grupo_materia}}" disabled>
+                    </div>
+
+                    <hr>                
+
+                    <form action="/admin/course/edit/{{id}}" method="POST">
+                        
+                        <div class="form-group ">
+                            
+                            <input type="text" class="form-control" placeholder="nombre" name="name">
+                        </div>
+                        <div class="form-group">
+                            
+                            <input type="text" class="form-control" placeholder="grupo"
+                                name="group">
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block">Actualizar</button>
+                        </div>
+                        
+                    </form>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{> footer}}
