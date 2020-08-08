@@ -3,6 +3,8 @@ const router = express.Router();
 const pool = require('../db/database');
 const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 const helpers = require('../lib/helpers');
+const { upload } = require('../lib/file');
+
 
 router.get('/', isloggedIn, async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
@@ -157,9 +159,6 @@ router.get('/course/delete/:id', async(req, res) => {
     res.redirect('/admin/course');
 });
 
-// -----------------------------------proceso-------------------------------------------
-
-
 router.get('/course/edit/:id', async(req, res) => {
     const { id } = req.params;
     const data = await pool.query('SELECT * FROM materia WHERE idMateria = ? ', [id]);
@@ -168,31 +167,45 @@ router.get('/course/edit/:id', async(req, res) => {
     });
 });
 
-
 router.post('/course/edit/:id', async(req, res) => {
     const { id } = req.params;
     const { name, group } = req.body;
     const data = await pool.query('SELECT * FROM materia WHERE idMateria = ? ', [id]);
 
     if (data[0].Nombre_materia != name && data[0].Grupo_materia != group) {
-        //actualiza los dos
+        const update = await pool.query(`UPDATE materia SET Nombre_materia='${name}',Grupo_materia='${group}'  WHERE idMateria=${id}`);
+        req.flash('success', 'Se ha actualizado nombre y grupo satisfactoriamente');
+        res.redirect('/admin/course');
     } else if (data[0].Nombre_materia == name && data[0].Grupo_materia != group) {
-        //actualiza grupo
+        const update = await pool.query(`UPDATE materia SET Grupo_materia='${group}'  WHERE idMateria=${id}`);
+        req.flash('success', 'Se ha actualizado grupo satisfactoriamente');
+        res.redirect('/admin/course');
     } else if (data[0].Nombre_materia != name && data[0].Grupo_materia == group) {
-        //actualiza nombre
+        const update = await pool.query(`UPDATE materia SET Nombre_materia='${name}' WHERE idMateria=${id}`);
+        req.flash('success', 'Se ha actualizado nombre satisfactoriamente');
+        res.redirect('/admin/course');
     }
     console.log(data[0])
     res.redirect('/admin/course');
 });
 
 
+// -----------------------------------proceso-------------------------------------------
+
+
+router.post('/data/upload', upload.single('file'), (req, res) => {
+    console.log(req.file);
+    res.send('archivo se subio correctamente');
+});
+
 
 router.get('/course/setting/:id', async(req, res) => {
     const { id } = req.params;
-
-    res.render('./admin/setting')
+    const data = pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
+    res.render('./admin/setting', {
+        data
+    })
 });
-
 
 router.get('/data', isloggedIn, async(req, res) => {
     // revisar si toda la informacion de las consultas es necesaria

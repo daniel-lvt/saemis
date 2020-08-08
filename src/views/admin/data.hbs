@@ -27,17 +27,23 @@
     <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
       <div class="card-body">
         <div class="form-group">
-          <form action="" method="POST">
-            <input type="file" name="document_users"
+          <form action="/admin/data/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file"
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-Excel"
               class="btn btn-primary">
             <p class="help-block">Selecciona un archivo tipo <span class="text-info">.xlsx .xlsm .xltm .xltx .xltm .xlam
                 .xlsb</span></p>
             <p class="text-danger bg-warning p-4">Esta accion borrara todos los usuarios actuales pertenecientes a la
               carrera</p>
-
-
+            <button class="btn btn-warning">Cargar Usuarios</button>
           </form>
+          <hr>
+          <div class="card-body">
+            <h4 class="mb-4">Ejemplos de descarga</h4>
+            <a href="/files/download/" download="user-exam.jpg">Usuarios</a>
+            <p></p>
+            <a href="/files/download/" download="updated-exam.jpg">Carga Archivos</a>
+          </div>
 
         </div>
 
