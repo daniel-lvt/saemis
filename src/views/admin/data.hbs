@@ -10,8 +10,44 @@
     </div>
 
     <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-      <div class="card-body">
-        aaa
+      <div class="card-body ">
+        {{!-- opciones para descargar --}}
+        <div class="container-sm">
+          <form action="admin/data/report/info" method="post">
+            <div class="row">
+              <div class="container">
+                <h6 class="alert alert-info ">Informacion <p class="text-danger">Informacion contenida</p>
+                </h6>
+                <select class="custom-select  mb-4" name="option_tipo">
+                  <option id="1">Estudiantes</option>
+                  <option id="2">Monitores</option>
+                  <option id="3">Docentes</option>
+                  <option id="4">Materias</option>
+                </select>
+                <button class="btn btn-primary btn-block">Generar Informe</button>
+              </div>
+            </div>
+          </form>
+
+          <hr>
+          <form action="/admin/data/report/data" method="post">
+            <div class="row">
+              <div class="container">
+
+                <h6 class="alert alert-info ">Datos Sistema <p class="text-danger">Informacion en torno a usuarios del
+                    sistema</p>
+                </h6>
+                <select class="custom-select  mb-4" name="option_tipo">
+                  <option id="1">Estudiantes</option>
+                  <option id="2">Docentes</option>
+                </select>
+                <button class="btn btn-primary btn-block">Generar Informe</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="col form-group">
+        </div>
       </div>
     </div>
   </div>

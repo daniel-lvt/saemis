@@ -183,16 +183,17 @@ router.post('/course/edit/:id', async(req, res) => {
 
 
 const validate_nombre = (entrada) => {
-        const info = entrada[1]
-        const e = new Number(info[info.length - 2]);
-        if (e >= 0) {
-            const retorno = info.slice(0, info.length - 2);
-            return retorno;
-        } else {
-            return info;
-        }
+    const info = entrada[1]
+    const e = new Number(info[info.length - 2]);
+    if (e >= 0) {
+        const retorno = info.slice(0, info.length - 2);
+        return retorno;
+    } else {
+        return info;
     }
-    // --------------------------- carga de usuarios, se puede mejorar bastante
+}
+
+// --------------------------- carga de usuarios, se puede mejorar bastante
 
 router.post('/data/upload', upload.single('file'), async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
@@ -241,15 +242,19 @@ const user = async(data, carrera, id) => {
 // -----------------------------------proceso-------------------------------------------
 
 
-
-
+router.post('/data/report/data', async(req, res) => {
+    // retorno de la informacion excel
+});
+router.post('/data/report/data', async(req, res) => {
+    // retorno de la informacion pdf
+});
 
 router.get('/course/setting/:id', async(req, res) => {
     const { id } = req.params;
     const data = pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
     res.render('./admin/setting', {
         data
-    })
+    });
 });
 
 router.get('/data', isloggedIn, async(req, res) => {
