@@ -4,6 +4,7 @@ const pool = require('../db/database');
 const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 const helpers = require('../lib/helpers');
 const { upload } = require('../lib/file');
+const xlsx = require('node-xlsx');
 
 
 router.get('/', isloggedIn, async(req, res) => {
@@ -99,16 +100,7 @@ router.post('/user/add', isloggedIn, async(req, res, next) => {
     const busqueda = usuario.split('.');
     const tipo = option_tipo.split('-')[0];
     const carrera = option_carrera.split('-')[0];
-    const validate_nombre = (entrada) => {
-        const info = entrada[1]
-        const e = new Number(info[info.length - 2]);
-        if (e >= 0) {
-            const retorno = info.slice(0, info.length - 2);
-            return retorno;
-        } else {
-            return info;
-        }
-    }
+
     let segundo_nombre = validate_nombre(busqueda);
 
     const new_user = {
@@ -190,13 +182,66 @@ router.post('/course/edit/:id', async(req, res) => {
 });
 
 
+const validate_nombre = (entrada) => {
+        const info = entrada[1]
+        const e = new Number(info[info.length - 2]);
+        if (e >= 0) {
+            const retorno = info.slice(0, info.length - 2);
+            return retorno;
+        } else {
+            return info;
+        }
+    }
+    // --------------------------- carga de usuarios, se puede mejorar bastante
+
+router.post('/data/upload', upload.single('file'), async(req, res) => {
+    const carrera = req.user.Carrera_idCarrera;
+    const data = pool.query('DELETE FROM usuario WHERE Carrera_idCarrera = ? ', [carrera]);
+    const workSheetsFromFile = xlsx.parse(req.file.path);
+    const ce = workSheetsFromFile[0].data.length;
+    const cd = workSheetsFromFile[1].data.length;
+    let ca = 0,
+        cb = 0
+    while (ca != ce) {
+        const data = workSheetsFromFile[0].data[ca];
+        user(data, carrera, 1);
+        ca++;
+    }
+    while (cb != cd) {
+        const data = workSheetsFromFile[1].data[cb];
+        user(data, carrera, 2);
+        cb++;
+    }
+    req.flash('success', 'Los Usuarios han sido subidos con exito');
+    res.redirect('/admin/user');
+});
+
+const user = async(data, carrera, id) => {
+    const codigo = data[0];
+    const correo = data[1];
+    const usuario = correo.split('@')[0];
+    const busqueda = usuario.split('.');
+    const segundo_nombre = validate_nombre(busqueda);
+    const new_user = {
+        Codigo: codigo,
+        Nombre_usuario: busqueda[0].toLowerCase() + ' ' + segundo_nombre.toLowerCase(),
+        Correo_usuario: correo,
+        Contrasena_usuario: usuario + codigo,
+        NombreUsuario_usuario: usuario,
+        Carrera_IdCarrera: carrera,
+        Tipo_idTipo: id
+    }
+    new_user.Contrasena_usuario = await helpers.encryptPassword(new_user.Contrasena_usuario);
+    const result = await pool.query('INSERT INTO usuario set?', [new_user]);
+}
+
+
+// ---------------------------------------------------------------------------
+
 // -----------------------------------proceso-------------------------------------------
 
 
-router.post('/data/upload', upload.single('file'), (req, res) => {
-    console.log(req.file);
-    res.send('archivo se subio correctamente');
-});
+
 
 
 router.get('/course/setting/:id', async(req, res) => {
