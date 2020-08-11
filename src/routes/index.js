@@ -1,35 +1,36 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 
 
-router.get('/', (req, res) => {
+router.get('/', isNotLoggedIn, (req, res) => {
     res.render('index');
 });
 
-router.get('/signin', (req, res) => {
+router.get('/signin', isNotLoggedIn, (req, res) => {
     res.render('log/signin')
 });
 
-router.get('/admin/signin', (req, res) => {
+router.get('/admin/signin', isNotLoggedIn, (req, res) => {
     res.render('log/signin_admin')
 });
 
-router.get('/root/signin', (req, res) => {
+router.get('/root/signin', isNotLoggedIn, (req, res) => {
     res.render('log/signin_root')
 });
 
-router.get('/logout', (req, res) => {
+router.get('/logout', isNotLoggedIn, (req, res) => {
     req.session.destroy();
     req.logOut();
     res.redirect('/');
 });
 
-router.post('/signin', (req, res) => {
+router.post('/signin', isNotLoggedIn, (req, res) => {
 
 });
 
-router.post('/admin/signin', (req, res, next) => {
+router.post('/admin/signin', isNotLoggedIn, (req, res, next) => {
     passport.authenticate('local.signin.admin', {
         successRedirect: '/admin/',
         failureRedirect: '/admin/signin',
@@ -37,7 +38,7 @@ router.post('/admin/signin', (req, res, next) => {
     })(req, res, next);
 });
 
-router.post('/root/signin', (req, res, next) => {
+router.post('/root/signin', isNotLoggedIn, (req, res, next) => {
     passport.authenticate('local.signin.root', {
         successRedirect: '/root/',
         failureRedirect: '/root/signin',
@@ -45,7 +46,7 @@ router.post('/root/signin', (req, res, next) => {
     })(req, res, next);
 });
 
-router.post('/root/signup', passport.authenticate('local.signup.root', {
+router.post('/root/signup', isNotLoggedIn, passport.authenticate('local.signup.root', {
     successRedirect: '/root/',
     failureRedirect: '/root/signin',
     failureFlash: true

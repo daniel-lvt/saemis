@@ -1,6 +1,12 @@
 <div class="jumbotron jumbotron-fluid">
   <div class="container">
-    <h1 class="display-4">Fluid jumbotron</h1>
-    <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+    {{#each data}}
+    <h4 class="display-4">{{Nombre_materia}}</h4>
+    <h6 class="display-5">Grupo : {{Grupo_materia}}</h6>
+    {{/each}}
   </div>
 </div>
+
+<img src="/img/icons/engineering-24px.svg" width="600" height="400" style="width:70%"
+    class="mx-auto d-block">
+    <h2 class="text-center">Working this area</h2>

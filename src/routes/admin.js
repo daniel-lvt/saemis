@@ -5,6 +5,8 @@ const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 const helpers = require('../lib/helpers');
 const { upload } = require('../lib/file');
 const xlsx = require('node-xlsx');
+const { dataInfo } = require('../lib/reports');
+
 
 
 router.get('/', isloggedIn, async(req, res) => {
@@ -38,7 +40,8 @@ router.get('/setting', isloggedIn, async(req, res) => {
 
 router.get('/user/edit/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
-    const dataEdit = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and u.Codigo=${id}`)
+    const carrera = req.user.Carrera_idCarrera;
+    const dataEdit = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and u.Codigo=${id} and u.Carrera_idCarrera=${carrera}`)
     const dataDB_tipo = await pool.query('SELECT * FROM tipo');
     const dataDB_carrera = await pool.query('SELECT * FROM carrera');
     res.render('./admin/user_edit', {
@@ -51,8 +54,9 @@ router.get('/user/edit/:id', isloggedIn, async(req, res) => {
 
 router.get('/user/delete/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
-    const d = await pool.query(`SELECT *FROM usuario WHERE Codigo=${id}`);
-    const del = await pool.query(`DELETE FROM usuario WHERE Codigo=${id}`);
+    const carrera = req.user.Carrera_idCarrera;
+    const d = await pool.query(`SELECT *FROM usuario WHERE Codigo=${id} and Carrera_idCarrera=${carrera}`);
+    const del = await pool.query(`DELETE FROM usuario WHERE Codigo=${id} and Carrera_idCarrera=${carrera}`);
     req.flash('success', `Se ha eliminado ${d[0].Nombre_usuario} satisfactoriamente`);
     res.redirect('/admin/user');
 });
@@ -72,15 +76,16 @@ router.post('/course/add', isloggedIn, async(req, res) => {
 
 router.post('/user/edit/:id', isloggedIn, async(req, res) => {
     const { option_tipo } = req.body;
+    const carrera = req.user.Carrera_idCarrera;
     const { id } = req.params;
     const option_change_tipo = option_tipo.split('-')[0];
-    const verificacionid = await pool.query(`SELECT * FROM usuario WHERE Codigo=${id}`);
+    const verificacionid = await pool.query(`SELECT * FROM usuario WHERE Codigo=${id} and Carrera_idCarrera =${carrera}`);
     const { Tipo_idTipo } = verificacionid[0];
     if (Tipo_idTipo == option_change_tipo) {
         req.flash('message', 'No se han presentado cambios');
         res.redirect('/admin/user');
     } else if (Tipo_idTipo != option_change_tipo) {
-        const updatetipo = await pool.query(`UPDATE usuario SET Tipo_idTipo=${option_change_tipo} WHERE Codigo=${id}`); // verificar la validacion de la base de datos
+        const updatetipo = await pool.query(`UPDATE usuario SET Tipo_idTipo=${option_change_tipo} WHERE Codigo=${id} and Carrera_idCarrera=${carrera}`); // verificar la validacion de la base de datos
         req.flash('success', 'Se ha actualizado el tipo satisfactoriamente');
         res.redirect('/admin/user');
     }
@@ -119,7 +124,6 @@ router.post('/user/add', isloggedIn, async(req, res, next) => {
 });
 
 router.post('/password', isloggedIn, async(req, res) => {
-    console.log('entro')
     const { current_password, new_password, new_password_repeat } = req.body;
     if (new_password === new_password_repeat) {
         const user = req.session.passport.user;
@@ -145,15 +149,17 @@ router.post('/password', isloggedIn, async(req, res) => {
 
 router.get('/course/delete/:id', async(req, res) => {
     const { id } = req.params;
-    const name = await pool.query('SELECT Nombre_materia,Grupo_materia from materia WHERE idMateria = ?', [id]);
-    const data = await pool.query('DELETE FROM materia WHERE idMateria = ?', [id]);
+    const carrera = req.user.Carrera_idCarrera;
+    const name = await pool.query(`SELECT Nombre_materia,Grupo_materia from materia WHERE idMateria = ${id} and Carrera_idCarrera = ${carrera}`);
+    const data = await pool.query(`DELETE FROM materia WHERE idMateria = ${id} and Carrera_idCarrera = ${carrera}`);
     req.flash('success', `Se ha eliminado ${name[0].Nombre_materia} con grupo ${name[0].Grupo_materia} satisfactoriamente`);
     res.redirect('/admin/course');
 });
 
 router.get('/course/edit/:id', async(req, res) => {
+    const carrera = req.user.Carrera_idCarrera;
     const { id } = req.params;
-    const data = await pool.query('SELECT * FROM materia WHERE idMateria = ? ', [id]);
+    const data = await pool.query(`SELECT * FROM materia WHERE idMateria = ${id} and Carrera_idCarrera = ${carrera}`);
     res.render('./admin/course_edit', {
         data
     });
@@ -245,14 +251,33 @@ const user = async(data, carrera, id) => {
 router.post('/data/report/data', async(req, res) => {
     // retorno de la informacion excel
 });
-router.post('/data/report/data', async(req, res) => {
+router.post('/data/report/info|', async(req, res) => {
     // retorno de la informacion pdf
+    const idCarrera = req.user.Carrera_idCarrera;
+    const { option_tipo } = req.body;
+    if (option_tipo === 'Estudiantes') {
+        console.log('estudiante');
+        dataInfo(idCarrera, 1);
+    } else if (option_tipo === 'Docentes') {
+        console.log('docente');
+        dataInfo(idCarrera, 2);
+    } else if (option_tipo === 'Monitores') {
+        console.log('monitores');
+        dataInfo(idCarrera, 3);
+    } else {
+        dataInfo(idCarrera, 4);
+        console.log('materias')
+    }
+
+    // dataEstudiantes(idCarrera);
+
+
 });
 
 router.get('/course/setting/:id', async(req, res) => {
     const { id } = req.params;
-    const data = pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
-    res.render('./admin/setting', {
+    const data = await pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
+    res.render('./admin/course_setting', {
         data
     });
 });
