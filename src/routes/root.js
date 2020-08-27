@@ -49,10 +49,16 @@ router.get('/program/edit/:id', isloggedIn, async(req, res) => {
 
 router.get('/program/delete/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
-    const d = await pool.query('SELECT * FROM carrera where idCarrera=?', [id]);
-    const del = await pool.query('DELETE FROM carrera where idCarrera=?', [id])
-    req.flash('success', `Se ha eliminado satisfactoriamente ${d[0].Descripcion_carrera} de la base de datos`)
-    res.redirect('/root/program');
+    const usuario_admin = await pool.query("select * from usuario_admin where Carrera_idCarrera = ?", [id]);
+    if (usuario_admin.length > 0) {
+        req.flash('message', `No puede eliminar un programa que actualmente este siendo utilizado por un usuario`);
+        res.redirect('/root/program');
+    } else {
+        const d = await pool.query('SELECT * FROM carrera where idCarrera=?', [id]);
+        const del = await pool.query('DELETE FROM carrera where idCarrera=?', [id]);
+        req.flash('success', `Se ha eliminado satisfactoriamente ${d[0].Descripcion_carrera} de la base de datos`);
+        res.redirect('/root/program');
+    }
 });
 
 router.get('/user/delete/:id', isloggedIn, async(req, res) => {
