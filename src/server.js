@@ -44,15 +44,17 @@ app.use((req, res, next) => {
     if (req.user != undefined) {
         app.locals.usuario_root = req.user.tipo_usuario_root == 'root' ? true : false;
         app.locals.usuario_admin = req.user.tipo_usuario_admin == 'admin' ? true : false;
+        app.locals.usuario_estudiante = req.user.Tipo_idTipo == 1 ? true : false;
+        app.locals.usuario_docente = req.user.Tipo_idTipo == 2 ? true : false;
+        app.locals.usuario_monitor = req.user.Tipo_idTipo == 3 ? true : false;
     }
     next();
-})
-
+});
 
 app.use(require('./routes'));
 app.use('/root', require('./routes/root'));
 app.use('/admin', require('./routes/admin'));
-
+app.use('/user', require('./routes/user'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 

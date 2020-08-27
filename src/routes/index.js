@@ -20,14 +20,18 @@ router.get('/root/signin', isNotLoggedIn, (req, res) => {
     res.render('log/signin_root')
 });
 
-router.get('/logout', isNotLoggedIn, (req, res) => {
+router.get('/logout', (req, res) => {
     req.session.destroy();
     req.logOut();
     res.redirect('/');
 });
 
-router.post('/signin', isNotLoggedIn, (req, res) => {
-
+router.post('/signin', isNotLoggedIn, (req, res, next) => {
+    passport.authenticate('local.signin', {
+        successRedirect: '/user/',
+        failureRedirect: '/signin',
+        failureFlash: true
+    })(req, res, next);
 });
 
 router.post('/admin/signin', isNotLoggedIn, (req, res, next) => {

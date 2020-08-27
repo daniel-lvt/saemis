@@ -3,5 +3,11 @@
 {{> nav_opt_root}}
 {{else if usuario_admin}}
 {{> nav_opt_admin}}
+{{else if usuario_estudiante}}
+{{> nav_opt_user_student}}
+{{else if usuario_docente}}
+{{> nav_opt_user_teacher}}
+{{else if usuario_monitor}}
+{{> nav_opt_user_monitor}}
 {{/if}}
 {{/if}}

@@ -8,7 +8,6 @@ const xlsx = require('node-xlsx');
 const { dataInfo } = require('../lib/reports');
 
 
-
 router.get('/', isloggedIn, async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
     const db_carrera = await pool.query('select idCarrera,Nombre_carrera,Descripcion_carrera from carrera where idCarrera = ?', [carrera]);
