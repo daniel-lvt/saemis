@@ -1,10 +1,103 @@
-<div class="jumbotron jumbotron-fluid">
-  <div class="container">
-    {{#each data}}
-    <h4 class="display-4">{{Nombre_materia}}</h4>
-    <h6 class="display-5">Grupo : {{Grupo_materia}}</h6>
-    {{/each}}
-  </div>
+<div class="container p-4">
+  {{#each data}}
+  <h4 class="display-4">{{Nombre_materia}}</h4>
+  <h6 class="display-5">Grupo : {{Grupo_materia}}</h6>
+  {{/each}}
 </div>
+<div class="card">
+  <div class="accordion" id="accordionExample">
+    <div class="card">
+      <div class="card-header" id="headingOne">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+            data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            Añadir Estudiantes
+          </button>
+        </h2>
+      </div>
+      <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+        <div class="card-body">
+          <form action="/admin/course/setting/add-students/{{id}}" method="POST">
+            <div class="p-4">
+              <h4>Integrantes Curso</h4>
+              <button class="btn btn-success m-2">Agregar Estudiantes</button>
+              <table class="table" id="id_user_root">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col"></th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Codigo</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Carrera</th>
+                    <th scope="col">Tipo de Usuario</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each estudiantes}}
+                  <tr>
+                    <th scope="row">{{@key}}</th>
+                    <td>
+                      <div class="row">
+                        <div class="input.group-text">
+                          <input type="checkbox" name="{{Codigo}}">
+                        </div>
+                      </div>
 
-{{> working}}
+                    </td>
+                    <td>{{Nombre_usuario}}</td>
+                    <td>{{Codigo}}</td>
+                    <td>{{Correo_usuario}}</td>
+                    <td>{{Nombre_carrera}}</td>
+                    <td>{{Nombre_tipo}}</td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="accordion" id="accordionExample">
+    <div class="card">
+      <div class="card-header" id="headingOne">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+            data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
+            Añadir Docente
+          </button>
+        </h2>
+      </div>
+      <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+        <div class="card-body">
+          <form action="/admin/user/add" method="POST">
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="accordion" id="accordionExample">
+    <div class="card">
+      <div class="card-header" id="headingOne">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+            data-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">
+            Listar
+          </button>
+        </h2>
+      </div>
+      <div id="collapseThree" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+        <div class="card-body">
+
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

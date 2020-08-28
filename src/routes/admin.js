@@ -250,35 +250,47 @@ const user = async(data, carrera, id) => {
 router.post('/data/report/data', async(req, res) => {
     // retorno de la informacion excel
 });
-router.post('/data/report/info|', async(req, res) => {
+router.post('/data/report/info', async(req, res) => {
     // retorno de la informacion pdf
     const idCarrera = req.user.Carrera_idCarrera;
     const { option_tipo } = req.body;
     if (option_tipo === 'Estudiantes') {
-        console.log('estudiante');
         dataInfo(idCarrera, 1);
     } else if (option_tipo === 'Docentes') {
-        console.log('docente');
         dataInfo(idCarrera, 2);
     } else if (option_tipo === 'Monitores') {
-        console.log('monitores');
         dataInfo(idCarrera, 3);
     } else {
         dataInfo(idCarrera, 4);
-        console.log('materias')
     }
-
     // dataEstudiantes(idCarrera);
-
-
 });
 
 router.get('/course/setting/:id', async(req, res) => {
     const { id } = req.params;
+    const carrera = req.user.Carrera_idCarrera;
     const data = await pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
+    const estudiantes = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="estudiante"`);
     res.render('./admin/course_setting', {
-        data
+        data,
+        estudiantes,
+        id
     });
+});
+
+router.post('/course/setting/add-students/:id', async(req, res) => {
+    const { id } = req.params;
+    const carrera = req.user.Carrera_IdCarrera;
+    const data = Object.keys(req.body).map(x => parseInt(x));
+    const out = data.slice(0, data.length - 1);
+
+    const contenido_curso = {
+        Materia_idMateria: id,
+        Materia_Carrera_idCarrera: carrera,
+
+    }
+    console.log(out);
+    console.log('sale')
 });
 
 router.get('/data', isloggedIn, async(req, res) => {
