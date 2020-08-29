@@ -280,17 +280,19 @@ router.get('/course/setting/:id', async(req, res) => {
 
 router.post('/course/setting/add-students/:id', async(req, res) => {
     const { id } = req.params;
-    const carrera = req.user.Carrera_IdCarrera;
     const data = Object.keys(req.body).map(x => parseInt(x));
     const out = data.slice(0, data.length - 1);
-
-    const contenido_curso = {
-        Materia_idMateria: id,
-        Materia_Carrera_idCarrera: carrera,
-
+    let i = 0;
+    while (i != (out.length)) {
+        const contenido_curso = {
+            Materia_idMateria: id,
+            Usuario_Codigo: out[i],
+        }
+        const ins = await pool.query('insert into contenidocurso set?', [contenido_curso]);
+        i += 1;
     }
-    console.log(out);
-    console.log('sale')
+    req.flash('success', 'Los estudiantes han sido agregados al curso');
+    res.redirect(`/admin/course/setting/${id}`);
 });
 
 router.get('/data', isloggedIn, async(req, res) => {
@@ -298,8 +300,7 @@ router.get('/data', isloggedIn, async(req, res) => {
     // consultar con modulos que mas informacion debemos de proporcionar en data
     const dataDB_tipo = await pool.query('SELECT * FROM tipo');
     const dataDB_carrera = await pool.query('SELECT * FROM carrera');
-    const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo')
-
+    const dataDB_usuarios = await pool.query('SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo');
     res.render('./admin/data', {
         dataDB_carrera,
         dataDB_tipo,
