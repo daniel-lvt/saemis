@@ -7,7 +7,6 @@ const { upload } = require('../lib/file');
 const xlsx = require('node-xlsx');
 const { dataInfo } = require('../lib/reports');
 
-
 router.get('/', isloggedIn, async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
     const db_carrera = await pool.query('select idCarrera,Nombre_carrera,Descripcion_carrera from carrera where idCarrera = ?', [carrera]);
@@ -241,6 +240,44 @@ const user = async(data, carrera, id) => {
     const result = await pool.query('INSERT INTO usuario set?', [new_user]);
 }
 
+router.get('/course/setting/:id', async(req, res) => {
+    const { id } = req.params;
+    const carrera = req.user.Carrera_idCarrera;
+    const data = await pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
+    const estudiantes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and not t.Nombre_tipo="docente"`);
+    const docentes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="docente"`);
+    const monitor = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="monitor"`);
+    const listado = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is not null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera}`);
+    res.render('./admin/course_setting', {
+        data,
+        estudiantes,
+        docentes,
+        monitor,
+        listado,
+        id
+    });
+});
+
+router.post('/course/setting/add-monitor/:id', async(req, res) => {
+    const { id } = req.params;
+    const validate = await pool.query(`select * from contenidocurso where Codigo_Monitor is not null`);
+    if (validate.length > 0) {
+        req.flash('message', 'No puede asignar dos monitores a una misma materia');
+        res.redirect(`/admin/course/setting/${id}`);
+    } else {
+        const data = Object.keys(req.body).map(x => parseInt(x));
+        const out = data.slice(0, data.length);
+        const new_monitor = {
+            Materia_idMateria: id,
+            Usuario_Codigo: out[0],
+            Codigo_Monitor: out[0]
+        };
+        const monitor = await pool.query('insert into contenidocurso set?', [new_monitor]);
+        req.flash('success', 'Ha sido asignado un nuevo monitor a la materia');
+        res.redirect(`/admin/course/setting/${id}`);
+    }
+});
+
 
 // ---------------------------------------------------------------------------
 
@@ -263,25 +300,14 @@ router.post('/data/report/info', async(req, res) => {
     } else {
         dataInfo(idCarrera, 4);
     }
-    // dataEstudiantes(idCarrera);
 });
 
-router.get('/course/setting/:id', async(req, res) => {
-    const { id } = req.params;
-    const carrera = req.user.Carrera_idCarrera;
-    const data = await pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
-    const estudiantes = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="estudiante"`);
-    res.render('./admin/course_setting', {
-        data,
-        estudiantes,
-        id
-    });
-});
+
 
 router.post('/course/setting/add-students/:id', async(req, res) => {
     const { id } = req.params;
     const data = Object.keys(req.body).map(x => parseInt(x));
-    const out = data.slice(0, data.length - 1);
+    const out = data.slice(0, data.length);
     let i = 0;
     while (i != (out.length)) {
         const contenido_curso = {
