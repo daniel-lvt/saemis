@@ -1,21 +1,20 @@
-<h4 class="p-4">Listado Curso</h4>
+<h4>Listado Curso</h4>
+<button class="btn btn-success m-2">eliminar</button>
 <table class="table" id="id_user_root">
-    {{> table_course_cont_config}}
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Eliminar</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Codigo</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Carrera</th>
+            <th scope="col">Tipo de Usuario</th>
+        </tr>
+    </thead>
     <tbody>
         {{#each listado}}
-        <tr>
-            <th scope="row">{{@key}}</th>
-            <td>
-                <div class="row">
-
-                </div>
-            </td>
-            <td>{{Nombre_usuario}}</td>
-            <td>{{Codigo}}</td>
-            <td>{{Correo_usuario}}</td>
-            <td>{{Nombre_carrera}}</td>
-            <td>{{Nombre_tipo}}</td>
-        </tr>
+        {{> table_course_list_config}}
         {{/each}}
     </tbody>
 </table>

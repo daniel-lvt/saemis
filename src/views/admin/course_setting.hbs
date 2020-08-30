@@ -1,10 +1,9 @@
-<div class="container p-4">
+<div class="container p-2">
   {{#each data}}
   <h4 class="display-4">{{Nombre_materia}}</h4>
   <h6 class="display-5">Grupo : {{Grupo_materia}}</h6>
   {{/each}}
 </div>
-
 <div class="card">
   <div class="accordion" id="accordionExample">
     <div class="card">
@@ -19,39 +18,16 @@
       <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
         <div class="card-body">
           <form action="/admin/course/setting/add-students/{{id}}" method="POST">
-            <div class="p-4">
+            <div class="p-2">
               <h4>Integrantes Curso</h4>
               <button class="btn btn-success m-2">Agregar Estudiantes</button>
               <table class="table" id="id_course">
                 <thead class="thead-dark">
-                  <thead class="thead-dark">
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col"></th>
-                      <th scope="col">Nombre</th>
-                      <th scope="col">Codigo</th>
-                      <th scope="col">Correo</th>
-                      <th scope="col">Carrera</th>
-                      <th scope="col">Tipo de Usuario</th>
-                    </tr>
-                  </thead>
+                  {{> table_course_cont_config}}
+                </thead>
                 <tbody>
                   {{#each estudiantes}}
-                  <tr>
-                    <th scope="row">{{@key}}</th>
-                    <td>
-                      <div class="row">
-                        <div class="input.group-text">
-                          <input type="checkbox" name="{{Codigo}}">
-                        </div>
-                      </div>
-                    </td>
-                    <td>{{Nombre_usuario}}</td>
-                    <td>{{Codigo}}</td>
-                    <td>{{Correo_usuario}}</td>
-                    <td>{{Nombre_carrera}}</td>
-                    <td>{{Nombre_tipo}}</td>
-                  </tr>
+                  {{>table_course_list_config}}
                   {{/each}}
                 </tbody>
               </table>
@@ -74,39 +50,16 @@
       <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
         <div class="card-body">
           <form action="/admin/course/setting/add-monitor/{{id}}" method="POST">
-            <div class="p-4">
+            <div class="p-2">
               <h4>Monitores</h4>
               <button class="btn btn-success m-2">Agregar Monitor</button>
               <table class="table" id="id_user_root">
                 <thead class="thead-dark">
-                  <thead class="thead-dark">
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col"></th>
-                      <th scope="col">Nombre</th>
-                      <th scope="col">Codigo</th>
-                      <th scope="col">Correo</th>
-                      <th scope="col">Carrera</th>
-                      <th scope="col">Tipo de Usuario</th>
-                    </tr>
-                  </thead>
+                  {{> table_course_cont_config}}
+                </thead>
                 <tbody>
                   {{#each monitor}}
-                  <tr>
-                    <th scope="row">{{@key}}</th>
-                    <td>
-                      <div class="row">
-                        <div class="input.group-text">
-                          <input type="checkbox" name="{{Codigo}}">
-                        </div>
-                      </div>
-                    </td>
-                    <td>{{Nombre_usuario}}</td>
-                    <td>{{Codigo}}</td>
-                    <td>{{Correo_usuario}}</td>
-                    <td>{{Nombre_carrera}}</td>
-                    <td>{{Nombre_tipo}}</td>
-                  </tr>
+                  {{>table_course_list_config}}
                   {{/each}}
                 </tbody>
               </table>
@@ -129,38 +82,16 @@
       <div id="collapseThree" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
         <div class="card-body">
           <form action="/admin/course/setting/add-teacher/{{id}}" method="POST">
-            <div class="p-4">
+            <div class="p-2">
               <h4>Docente</h4>
               <button class="btn btn-success m-2">Agregar Docente</button>
               <table class="table" id="id_user_root">
                 <thead class="thead-dark">
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col"></th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Codigo</th>
-                    <th scope="col">Correo</th>
-                    <th scope="col">Carrera</th>
-                    <th scope="col">Tipo de Usuario</th>
-                  </tr>
+                  {{> table_course_cont_config}}
                 </thead>
                 <tbody>
                   {{#each docentes}}
-                  <tr>
-                    <th scope="row">{{@key}}</th>
-                    <td>
-                      <div class="row">
-                        <div class="input.group-text">
-                          <input type="checkbox" name="{{Codigo}}">
-                        </div>
-                      </div>
-                    </td>
-                    <td>{{Nombre_usuario}}</td>
-                    <td>{{Codigo}}</td>
-                    <td>{{Correo_usuario}}</td>
-                    <td>{{Nombre_carrera}}</td>
-                    <td>{{Nombre_tipo}}</td>
-                  </tr>
+                  {{>table_course_list_config}}
                   {{/each}}
                 </tbody>
               </table>
@@ -182,9 +113,11 @@
       </div>
       <div id="collapseFour" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
         <div class="card-body">
-          <div class="p-4">
-            {{> table_course_list}}
-          </div>
+          <form action="/admin/course/setting/delete/{{id}}" method="POST">
+            <div class="p-2">
+              {{> table_course_list}}
+            </div>
+          </form>
         </div>
       </div>
     </div>
