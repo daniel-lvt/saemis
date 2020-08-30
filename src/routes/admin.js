@@ -278,6 +278,35 @@ router.post('/course/setting/add-monitor/:id', async(req, res) => {
     }
 });
 
+router.post('/course/setting/delete/:id', async(req, res) => {
+    const { id } = req.params;
+    const data = Object.keys(req.body).map(x => parseInt(x));
+    const out = data.slice(0, data.length);
+    let i = 0;
+    while (i != (out.length)) {
+        const salida = await pool.query(`delete from contenidocurso where Usuario_Codigo=${out[i]} and Materia_idMateria=${id}`)
+        i += 1;
+    }
+    req.flash('success', 'Se ha eliminado la informacion seleccionada');
+    res.redirect(`/admin/course/setting/${id}`);
+});
+
+router.post('/course/setting/add-students/:id', async(req, res) => {
+    const { id } = req.params;
+    const data = Object.keys(req.body).map(x => parseInt(x));
+    const out = data.slice(0, data.length);
+    let i = 0;
+    while (i != (out.length)) {
+        const contenido_curso = {
+            Materia_idMateria: id,
+            Usuario_Codigo: out[i],
+        }
+        const ins = await pool.query('insert into contenidocurso set?', [contenido_curso]);
+        i += 1;
+    }
+    req.flash('success', 'Los estudiantes han sido agregados al curso');
+    res.redirect(`/admin/course/setting/${id}`);
+});
 
 // ---------------------------------------------------------------------------
 
@@ -300,25 +329,6 @@ router.post('/data/report/info', async(req, res) => {
     } else {
         dataInfo(idCarrera, 4);
     }
-});
-
-
-
-router.post('/course/setting/add-students/:id', async(req, res) => {
-    const { id } = req.params;
-    const data = Object.keys(req.body).map(x => parseInt(x));
-    const out = data.slice(0, data.length);
-    let i = 0;
-    while (i != (out.length)) {
-        const contenido_curso = {
-            Materia_idMateria: id,
-            Usuario_Codigo: out[i],
-        }
-        const ins = await pool.query('insert into contenidocurso set?', [contenido_curso]);
-        i += 1;
-    }
-    req.flash('success', 'Los estudiantes han sido agregados al curso');
-    res.redirect(`/admin/course/setting/${id}`);
 });
 
 router.get('/data', isloggedIn, async(req, res) => {
