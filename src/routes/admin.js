@@ -110,7 +110,7 @@ router.post('/user/add', isloggedIn, async(req, res, next) => {
         Codigo: code,
         Nombre_usuario: busqueda[0].toLowerCase() + ' ' + segundo_nombre.toLowerCase(),
         Correo_usuario: mail,
-        Contrasena_usuario: code,
+        Contrasena_usuario: usuario + code,
         NombreUsuario_usuario: usuario,
         Carrera_IdCarrera: carrera,
         Tipo_idTipo: tipo
@@ -291,6 +291,27 @@ router.post('/course/setting/delete/:id', async(req, res) => {
     res.redirect(`/admin/course/setting/${id}`);
 });
 
+router.post('/course/setting/add-teacher/:id', async(req, res) => {
+    const { id } = req.params;
+    const data = Object.keys(req.body).map(x => parseInt(x));
+    const out = data.slice(0, data.length);
+    const actual = await pool.query(`select * from contenidocurso where Materia_idMateria=${id} and Codigo_Docente is not null`);
+    if (actual.length > 0) {
+        req.flash('message', 'no puede agregar un docente teniendo un docente activo en el curso');
+        res.redirect(`/admin/course/setting/${id}`);
+    } else {
+        const new_docente = {
+            Materia_idMateria: id,
+            Usuario_Codigo: out[0],
+            Codigo_Monitor: null,
+            Codigo_Docente: out[0]
+        }
+        const salida = await pool.query('insert into contenidocurso set?', [new_docente]);
+        req.flash('success', 'se ha agregado un nuevo docente');
+        res.redirect(`/admin/course/setting/${id}`);
+    }
+});
+
 router.post('/course/setting/add-students/:id', async(req, res) => {
     const { id } = req.params;
     const data = Object.keys(req.body).map(x => parseInt(x));
@@ -308,7 +329,6 @@ router.post('/course/setting/add-students/:id', async(req, res) => {
     res.redirect(`/admin/course/setting/${id}`);
 });
 
-// ---------------------------------------------------------------------------
 
 // -----------------------------------proceso-------------------------------------------
 
