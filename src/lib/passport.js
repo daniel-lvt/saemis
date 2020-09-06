@@ -5,7 +5,6 @@ const pool = require('../db/database');
 const helpers = require('../lib/helpers');
 
 // Root
-
 passport.use('local.signup.root', new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password',
@@ -65,6 +64,24 @@ passport.use('local.signin.admin', new LocalStrategy({
 
 // Usuario
 
+passport.use('local.signin', new LocalStrategy({
+    usernameField: 'username',
+    passwordField: 'password',
+    passReqToCallback: true
+}, async(req, username, password, done) => {
+    const rows = await pool.query('SELECT * FROM usuario WHERE NombreUsuario_usuario = ?', [username]);
+    if (rows.length > 0) {
+        const user = rows[0];
+        const validPassword = await helpers.mathPassword(password, user.Contrasena_usuario);
+        if (validPassword) {
+            done(null, user, req.flash('success', `Bienvenido ${user.Nombre_usuario.toUpperCase()}!!!`));
+        } else {
+            done(null, false, req.flash('message', 'Contraseña incorrecta'));
+        }
+    } else {
+        return done(null, false, req.flash('message', `El usuario ${username} no se encuentra registrado en el sistema`));
+    }
+}));
 
 passport.serializeUser((user, done) => {
     if (user.tipo_usuario_root != undefined) {
@@ -78,7 +95,8 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async(id, done) => {
     if (id.length === undefined) {
-        console.log('usuario normal');
+        const rows = await pool.query('SELECT * FROM usuario WHERE Codigo=?', [id]);
+        done(null, rows[0]);
     } else if (id.split('')[0] === 'r') {
         const rows = await pool.query('SELECT * FROM usuario_root WHERE idUsuario_root = ?', [id]);
         done(null, rows[0]);

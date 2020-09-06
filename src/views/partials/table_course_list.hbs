@@ -1,0 +1,21 @@
+<h4 class="p-4">Listado Curso</h4>
+<table class="table" id="id_user_root">
+    {{> table_course_cont_config}}
+    <tbody>
+        {{#each listado}}
+        <tr>
+            <th scope="row">{{@key}}</th>
+            <td>
+                <div class="row">
+
+                </div>
+            </td>
+            <td>{{Nombre_usuario}}</td>
+            <td>{{Codigo}}</td>
+            <td>{{Correo_usuario}}</td>
+            <td>{{Nombre_carrera}}</td>
+            <td>{{Nombre_tipo}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
