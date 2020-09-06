@@ -11,4 +11,10 @@ router.get('/', async(req, res) => {
     });
 });
 
+router.get('/course/:id', async(req, res) => {
+    const { id } = req.params;
+    const info = await pool.query(``);
+    res.render('./user/course');
+});
+
 module.exports = router;

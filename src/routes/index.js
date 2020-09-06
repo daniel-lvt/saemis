@@ -56,6 +56,4 @@ router.post('/root/signup', isNotLoggedIn, passport.authenticate('local.signup.r
     failureFlash: true
 }));
 
-
-
 module.exports = router;

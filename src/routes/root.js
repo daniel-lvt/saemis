@@ -144,5 +144,4 @@ router.post('/city', isloggedIn, async(req, res) => {
     res.redirect('/root/city')
 });
 
-
 module.exports = router;

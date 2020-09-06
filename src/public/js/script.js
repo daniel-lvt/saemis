@@ -7,3 +7,6 @@ $(document).ready(() => {
 $(document).ready(() => {
     $('#id_user_admin').DataTable();
 });
+tinymce.init({
+    selector: '#example'
+});

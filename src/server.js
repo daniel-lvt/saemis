@@ -6,6 +6,7 @@ const passport = require('passport');
 const MySQLStore = require('express-mysql-session');
 const flash = require('connect-flash');
 const morgan = require('morgan');
+const compression = require('compression')
 
 const { database } = require('./config/database_keys');
 const app = express();
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(compression())
 
 app.use((req, res, next) => {
     app.locals.success = req.flash('success');
