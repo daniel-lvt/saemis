@@ -110,7 +110,7 @@ router.post('/user/add', isloggedIn, async(req, res, next) => {
         Codigo: code,
         Nombre_usuario: busqueda[0].toLowerCase() + ' ' + segundo_nombre.toLowerCase(),
         Correo_usuario: mail,
-        Contrasena_usuario: code,
+        Contrasena_usuario: usuario + code,
         NombreUsuario_usuario: usuario,
         Carrera_IdCarrera: carrera,
         Tipo_idTipo: tipo
@@ -244,10 +244,11 @@ router.get('/course/setting/:id', async(req, res) => {
     const { id } = req.params;
     const carrera = req.user.Carrera_idCarrera;
     const data = await pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
-    const estudiantes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and not t.Nombre_tipo="docente"`);
-    const docentes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="docente"`);
-    const monitor = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="monitor"`);
-    const listado = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo where cc.Usuario_Codigo is not null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera}`);
+
+    const estudiantes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and not t.Nombre_tipo="docente"`);
+    const docentes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="docente"`);
+    const monitor = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="monitor"`);
+    const listado = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Usuario_Codigo is not null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera}`);
     res.render('./admin/course_setting', {
         data,
         estudiantes,
@@ -278,8 +279,58 @@ router.post('/course/setting/add-monitor/:id', async(req, res) => {
     }
 });
 
+router.post('/course/setting/delete/:id', async(req, res) => {
+    const { id } = req.params;
+    const data = Object.keys(req.body).map(x => parseInt(x));
+    const out = data.slice(0, data.length);
+    let i = 0;
+    while (i != (out.length)) {
+        const salida = await pool.query(`delete from contenidocurso where Usuario_Codigo=${out[i]} and Materia_idMateria=${id}`)
+        i += 1;
+    }
+    req.flash('success', 'Se ha eliminado la informacion seleccionada');
+    res.redirect(`/admin/course/setting/${id}`);
+});
 
-// ---------------------------------------------------------------------------
+router.post('/course/setting/add-teacher/:id', async(req, res) => {
+    const { id } = req.params;
+    const data = Object.keys(req.body).map(x => parseInt(x));
+    const out = data.slice(0, data.length);
+    const actual = await pool.query(`select * from contenidocurso where Materia_idMateria=${id} and Codigo_Docente is not null`);
+    if (actual.length > 0) {
+        req.flash('message', 'no puede agregar un docente teniendo un docente activo en el curso');
+        res.redirect(`/admin/course/setting/${id}`);
+    } else {
+        const new_docente = {
+            Materia_idMateria: id,
+            Usuario_Codigo: out[0],
+            Codigo_Monitor: null,
+            Codigo_Docente: out[0]
+        }
+        const salida = await pool.query('insert into contenidocurso set?', [new_docente]);
+        req.flash('success', 'se ha agregado un nuevo docente');
+        res.redirect(`/admin/course/setting/${id}`);
+    }
+});
+
+router.post('/course/setting/add-students/:id', async(req, res) => {
+    const { id } = req.params;
+    const data = Object.keys(req.body).map(x => parseInt(x));
+    const out = data.slice(0, data.length);
+    let i = 0;
+    while (i != (out.length)) {
+        const contenido_curso = {
+            Materia_idMateria: id,
+            Usuario_Codigo: out[i],
+        }
+        const ins = await pool.query('insert into contenidocurso set?', [contenido_curso]);
+        i += 1;
+    }
+    req.flash('success', 'Los estudiantes han sido agregados al curso');
+    res.redirect(`/admin/course/setting/${id}`);
+});
+
+
 
 // -----------------------------------proceso-------------------------------------------
 
@@ -300,6 +351,7 @@ router.post('/data/report/info', async(req, res) => {
     } else {
         dataInfo(idCarrera, 4);
     }
+
 });
 
 
@@ -319,6 +371,7 @@ router.post('/course/setting/add-students/:id', async(req, res) => {
     }
     req.flash('success', 'Los estudiantes han sido agregados al curso');
     res.redirect(`/admin/course/setting/${id}`);
+
 });
 
 router.get('/data', isloggedIn, async(req, res) => {

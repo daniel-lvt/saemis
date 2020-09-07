@@ -1,1 +1,25 @@
+
 {{> working}}
+
+<div class="container p-5">
+    <div class="row">
+        {{#each cursos}}
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <a href="/user/course/{{Materia_idMateria}}">
+                        <h3 class="card-title text-uppercase">
+                            {{Nombre_materia}}
+                        </h3>
+                    </a>
+                    <p class="m-2">Grupo {{Grupo_materia}}</p>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
+
+
+<textarea name="" id="example" cols="30" rows="10"></textarea>
+

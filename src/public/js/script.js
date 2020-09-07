@@ -7,7 +7,6 @@ $(document).ready(() => {
 $(document).ready(() => {
     $('#id_user_admin').DataTable();
 });
-
 !(function($) {
     "use strict";
   
@@ -193,3 +192,8 @@ $(window).on('load', function() {
     });
   
   })(jQuery);
+
+tinymce.init({
+    selector: '#example'
+});
+

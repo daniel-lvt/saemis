@@ -15,6 +15,5 @@ module.exports = {
         } else {
             return res.redirect('/');
         }
-
     }
 }
