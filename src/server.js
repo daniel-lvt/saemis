@@ -6,10 +6,13 @@ const passport = require('passport');
 const MySQLStore = require('express-mysql-session');
 const flash = require('connect-flash');
 const morgan = require('morgan');
-const compression = require('compression')
+const socketIO = require('socket.io');
+const http = require('http');
+const compression = require('compression');
 
 const { database } = require('./config/database_keys');
 const app = express();
+const server = http.createServer(app);
 require('./lib/passport');
 
 app.set('port', process.env.PORT || 4000);
@@ -60,6 +63,8 @@ app.use('/user', require('./routes/user'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(app.get('port'), () => {
+module.exports.io = socketIO(server);
+require('./lib/sockets');
+server.listen(app.get('port'), () => {
     console.log('server on port :', app.get('port'));
 });
