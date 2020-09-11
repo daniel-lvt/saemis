@@ -353,16 +353,16 @@ router.post('/data/report/info', async(req, res) => {
         });
     }
     if (option_tipo === 'Estudiantes') {
-        const data = await createPDF(idCarrera, 1);
+        const data = await createPDF(idCarrera, 1, 'estudiantes');
         infoPDF(data, 'estudiante');
     } else if (option_tipo === 'Docentes') {
-        const data = await createPDF(idCarrera, 2);
+        const data = await createPDF(idCarrera, 2, 'docentes');
         infoPDF(data, 'docente');
     } else if (option_tipo === 'Monitores') {
-        const data = await createPDF(idCarrera, 3);
+        const data = await createPDF(idCarrera, 3, 'monitores');
         infoPDF(data, 'monitor');
     } else {
-        const data = await createPDF(idCarrera, 4);
+        const data = await createPDF(idCarrera, 4, 'cursos');
         infoPDF(data, 'materias');
     }
 });
