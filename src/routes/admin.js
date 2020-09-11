@@ -5,7 +5,8 @@ const { isNotLoggedIn, isloggedIn } = require('../lib/auth');
 const helpers = require('../lib/helpers');
 const { upload } = require('../lib/file');
 const xlsx = require('node-xlsx');
-const { dataInfo } = require('../lib/reports');
+const { createPDF } = require('../lib/pdf');
+const pdfMake = require('pdfmake/build/pdfmake');
 
 router.get('/', isloggedIn, async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
@@ -341,13 +342,26 @@ router.post('/data/report/info', async(req, res) => {
     const idCarrera = req.user.Carrera_idCarrera;
     const { option_tipo } = req.body;
     if (option_tipo === 'Estudiantes') {
-        dataInfo(idCarrera, 1);
+        const data = await createPDF(idCarrera, 1);
+        const pdfDoc = pdfMake.createPdf(data);
+
+        pdfDoc.getBase64((da) => {
+            res.writeHead(200, {
+                'Content-Type': 'application/dpf',
+                'Content-Disposition': `attachment;filename="estudiantes-${Date.now()}.pdf"`
+            });
+            const download = Buffer.from(da.toString('utf-8'), 'base64');
+            res.end(download);
+        })
+
     } else if (option_tipo === 'Docentes') {
-        dataInfo(idCarrera, 2);
+        createPDF(idCarrera, 2);
+
     } else if (option_tipo === 'Monitores') {
-        dataInfo(idCarrera, 3);
+        createPDF(idCarrera, 3);
+
     } else {
-        dataInfo(idCarrera, 4);
+        createPDF(idCarrera, 4);
     }
 });
 
