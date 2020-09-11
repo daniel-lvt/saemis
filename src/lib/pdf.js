@@ -28,15 +28,19 @@ const createPDF = async(id_carrera, id_busqueda) => {
 }
 
 const table = (input) => {
-    const info = []
+    const info = [];
     info.push([{ text: 'Codigo', style: 'tableHeader' }, { text: 'Correo', style: 'tableHeader' }, { text: 'Carrera', style: 'tableHeader' }, { text: 'Tipo', style: 'tableHeader' }]);
     for (i of input) {
-        const { Codigo, Correo_usuario, Carrera_idCarrera, Tipo_idTipo } = i
+        const { Codigo, Correo_usuario, Carrera_idCarrera, Tipo_idTipo } = i;
         info.push([Codigo, Correo_usuario, Carrera_idCarrera, Tipo_idTipo]);
     }
     return info;
 }
+const tableM = (input) => {
+    const info = [];
 
+    return info;
+}
 
 
 

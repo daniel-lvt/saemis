@@ -341,27 +341,29 @@ router.post('/data/report/info', async(req, res) => {
     // retorno de la informacion pdf
     const idCarrera = req.user.Carrera_idCarrera;
     const { option_tipo } = req.body;
-    if (option_tipo === 'Estudiantes') {
-        const data = await createPDF(idCarrera, 1);
-        const pdfDoc = pdfMake.createPdf(data);
-
+    const infoPDF = (out, tipo) => {
+        const pdfDoc = pdfMake.createPdf(out);
         pdfDoc.getBase64((da) => {
             res.writeHead(200, {
                 'Content-Type': 'application/dpf',
-                'Content-Disposition': `attachment;filename="estudiantes-${Date.now()}.pdf"`
+                'Content-Disposition': `attachment;filename="${tipo}-${Date.now()}.pdf"`
             });
             const download = Buffer.from(da.toString('utf-8'), 'base64');
             res.end(download);
-        })
-
+        });
+    }
+    if (option_tipo === 'Estudiantes') {
+        const data = await createPDF(idCarrera, 1);
+        infoPDF(data, 'estudiante');
     } else if (option_tipo === 'Docentes') {
-        createPDF(idCarrera, 2);
-
+        const data = await createPDF(idCarrera, 2);
+        infoPDF(data, 'docente');
     } else if (option_tipo === 'Monitores') {
-        createPDF(idCarrera, 3);
-
+        const data = await createPDF(idCarrera, 3);
+        infoPDF(data, 'monitor');
     } else {
-        createPDF(idCarrera, 4);
+        const data = await createPDF(idCarrera, 4);
+        infoPDF(data, 'materias');
     }
 });
 
