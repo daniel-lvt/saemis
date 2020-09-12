@@ -15,7 +15,7 @@ const createPDF = async(id_carrera, id_busqueda, valor_reporte) => {
         const structDocument = {
             content: [
                 { text: `Reporte ${valor_reporte}`, style: 'header' },
-                { text: `Listado de ${valor_reporte} del programa${carrera[0].Descripcion_carrera}`, sontSize: 12, bold: true, margin: [0, 20, 0, 8] },
+                { text: `Listado de ${valor_reporte} del programa ${carrera[0].Descripcion_carrera}`, sontSize: 12, bold: true, margin: [0, 20, 0, 8] },
                 {
                     table: {
                         headerRows: 1,
@@ -30,24 +30,7 @@ const createPDF = async(id_carrera, id_busqueda, valor_reporte) => {
                     { text: `Reporte generado ${outDate} \nSAEMIS`, style: 'small' }
                 ]
             },
-            styles: {
-                header: {
-                    fontSize: 18,
-                    bold: true
-                },
-                subheader: {
-                    fontSize: 15,
-                    bold: true
-                },
-                quote: {
-                    italics: true
-                },
-                small: {
-                    italics: true,
-                    fontSize: 8,
-                    margin: [20, 0]
-                }
-            }
+            styles: st
         }
         return structDocument;
     } else if (id_busqueda === 4) {
@@ -74,22 +57,7 @@ const createPDF = async(id_carrera, id_busqueda, valor_reporte) => {
                     { text: `Informacion generada`, style: 'small' }
                 ]
             },
-            styles: {
-                header: {
-                    fontSize: 18,
-                    bold: true
-                },
-                subheader: {
-                    fontSize: 15,
-                    bold: true
-                },
-                quote: {
-                    italics: true
-                },
-                small: {
-                    fontSize: 8
-                }
-            }
+            styles: st
         }
         return structDocument;
     }
@@ -117,8 +85,24 @@ const tableM = (input) => {
     }
     return info;
 }
-
-
+const st = {
+    header: {
+        fontSize: 18,
+        bold: true
+    },
+    subheader: {
+        fontSize: 15,
+        bold: true
+    },
+    quote: {
+        italics: true
+    },
+    small: {
+        italics: true,
+        fontSize: 8,
+        margin: [20, 0]
+    }
+}
 
 module.exports = {
     createPDF
