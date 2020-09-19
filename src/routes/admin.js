@@ -40,24 +40,35 @@ router.get('/setting', isloggedIn, async(req, res) => {
 router.get('/user/edit/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const carrera = req.user.Carrera_idCarrera;
-    const dataEdit = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and u.Codigo=${id} and u.Carrera_idCarrera=${carrera}`)
-    const dataDB_tipo = await pool.query('SELECT * FROM tipo');
-    const dataDB_carrera = await pool.query('SELECT * FROM carrera');
-    res.render('./admin/user_edit', {
-        dataEdit,
-        dataDB_tipo,
-        dataDB_carrera,
-        id
-    });
+    try {
+        const dataEdit = await pool.query(`SELECT u.Codigo, u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from usuario u,carrera c,tipo t where u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and u.Codigo=${id} and u.Carrera_idCarrera=${carrera}`);
+        const dataDB_tipo = await pool.query('SELECT * FROM tipo');
+        const dataDB_carrera = await pool.query('SELECT * FROM carrera');
+        res.render('./admin/user_edit', {
+            dataEdit,
+            dataDB_tipo,
+            dataDB_carrera,
+            id
+        });
+    } catch (e) {
+        res.send(e);
+    }
+
 });
 
 router.get('/user/delete/:id', isloggedIn, async(req, res) => {
     const { id } = req.params;
     const carrera = req.user.Carrera_idCarrera;
-    const d = await pool.query(`SELECT *FROM usuario WHERE Codigo=${id} and Carrera_idCarrera=${carrera}`);
-    const del = await pool.query(`DELETE FROM usuario WHERE Codigo=${id} and Carrera_idCarrera=${carrera}`);
-    req.flash('success', `Se ha eliminado ${d[0].Nombre_usuario} satisfactoriamente`);
-    res.redirect('/admin/user');
+    const validar_usuario = await pool.query(`select m.Nombre_materia from contenidocurso c,materia m where c.Usuario_Codigo=${id} and c.Materia_idMateria=m.idMateria`);
+    if (validar_usuario.length > 0) {
+        req.flash('message', 'el usuario actualmente tiene los siguientes cursos activos', [validar_usuario[0].Nombre_materia]);
+        res.redirect('/admin/user');
+    } else {
+        const d = await pool.query(`select * from usuario where Codigo=${id} and Carrera_idCarrera=${carrera}`);
+        const del = await pool.query(`delete from usuario where Codigo=${id} and Carrera_idCarrera=${carrera}`);
+        req.flash('success', `Se ha eliminado ${d[0].Nombre_usuario} satisfactoriamente`);
+        res.redirect('/admin/user');
+    }
 });
 
 router.post('/course/add', isloggedIn, async(req, res) => {
@@ -104,9 +115,7 @@ router.post('/user/add', isloggedIn, async(req, res, next) => {
     const busqueda = usuario.split('.');
     const tipo = option_tipo.split('-')[0];
     const carrera = option_carrera.split('-')[0];
-
     let segundo_nombre = validate_nombre(busqueda);
-
     const new_user = {
         Codigo: code,
         Nombre_usuario: busqueda[0].toLowerCase() + ' ' + segundo_nombre.toLowerCase(),
@@ -188,21 +197,20 @@ router.post('/course/edit/:id', async(req, res) => {
 
 
 const validate_nombre = (entrada) => {
-    const info = entrada[1]
-    const e = new Number(info[info.length - 2]);
-    if (e >= 0) {
-        const retorno = info.slice(0, info.length - 2);
-        return retorno;
-    } else {
-        return info;
+        const info = entrada[1]
+        const e = new Number(info[info.length - 2]);
+        if (e >= 0) {
+            const retorno = info.slice(0, info.length - 2);
+            return retorno;
+        } else {
+            return info;
+        }
     }
-}
-
-// --------------------------- carga de usuarios, se puede mejorar bastante
-
+    // --------------------------- carga de usuarios, se puede mejorar bastante
 router.post('/data/upload', upload.single('file'), async(req, res) => {
     const carrera = req.user.Carrera_idCarrera;
-    const data = pool.query('DELETE FROM usuario WHERE Carrera_idCarrera = ? ', [carrera]);
+    const del_cc = pool.query('delete from materia where Carrera_idCarrera = ?', [carrera]);
+    const data = pool.query('delete from usuario where Carrera_idCarrera = ? ', [carrera]);
     const workSheetsFromFile = xlsx.parse(req.file.path);
     const ce = workSheetsFromFile[0].data.length;
     const cd = workSheetsFromFile[1].data.length;
@@ -244,19 +252,23 @@ const user = async(data, carrera, id) => {
 router.get('/course/setting/:id', async(req, res) => {
     const { id } = req.params;
     const carrera = req.user.Carrera_idCarrera;
-    const data = await pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
-    const estudiantes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and not t.Nombre_tipo="docente"`);
-    const docentes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="docente"`);
-    const monitor = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="monitor"`);
-    const listado = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Usuario_Codigo is not null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera}`);
-    res.render('./admin/course_setting', {
-        data,
-        estudiantes,
-        docentes,
-        monitor,
-        listado,
-        id
-    });
+    try {
+        const data = await pool.query('SELECT * FROM materia WHERE idMateria =?', [id]);
+        const estudiantes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and not t.Nombre_tipo="docente";`);
+        const docentes = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="docente";`);
+        const monitor = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Materia_idMateria is null and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera} and t.Nombre_tipo="monitor";`);
+        const listado = await pool.query(`select u.Codigo,u.Nombre_usuario,u.Correo_usuario,u.NombreUsuario_usuario,c.Nombre_carrera,t.Nombre_tipo from carrera c,tipo t,usuario u left join contenidocurso cc on u.Codigo=cc.Usuario_Codigo and cc.Materia_idMateria=${id} where cc.Usuario_Codigo is not null and u.Carrera_idCarrera=${carrera} and u.Carrera_IdCarrera=c.idCarrera and u.Tipo_idTipo=t.idTipo and c.idCarrera =${carrera};`);
+        res.render('./admin/course_setting', {
+            data,
+            estudiantes,
+            docentes,
+            monitor,
+            listado,
+            id
+        });
+    } catch (error) {
+        res.send(error);
+    }
 });
 
 router.post('/course/setting/add-monitor/:id', async(req, res) => {
