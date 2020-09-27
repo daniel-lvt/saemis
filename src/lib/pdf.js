@@ -1,9 +1,13 @@
 const pdfMake = require('pdfmake/build/pdfmake');
 const pdfFonts = require('pdfmake/build/vfs_fonts');
 const pool = require('../db/database');
+const datauri = require('datauri');
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+//mirar como integrar imagenes en el pdf
+
 const createPDF = async(id_carrera, id_busqueda, valor_reporte) => {
+    const content = await datauri('src/public/img/logo-SAEMIS.png');
     const carrera = await pool.query(`select * from carrera where idCarrera=${id_carrera}`);
     const today = new Date();
     const f = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
@@ -34,7 +38,6 @@ const createPDF = async(id_carrera, id_busqueda, valor_reporte) => {
         }
         return structDocument;
     } else if (id_busqueda === 4) {
-
         //falta trabajo de contruccion de esta seccion
         //# Nombre_materia Grupo_materia Carrera_id docente numero de alumnos monitor
         const data = await pool.query(`select * from materia where Carrera_idCarrera=${id_carrera}`);

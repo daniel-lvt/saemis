@@ -11,10 +11,24 @@ router.get('/', async(req, res) => {
     });
 });
 
+
 router.get('/course/:id', async(req, res) => {
     const { id } = req.params;
-    const info = await pool.query(``);
-    res.render('./user/course');
+    try {
+        const course = await pool.query('select * from materia where idMateria= ?', [id]);
+        const docente = await pool.query(`select * from usuario where Codigo=(select Usuario_Codigo from contenidocurso where Materia_idMateria =${id} and Codigo_Docente is not null)`);
+        const monitor = await pool.query(`select * from usuario where Codigo=(select Usuario_Codigo from contenidocurso where Materia_idMateria =${id} and Codigo_Monitor is not null)`);
+        //revisar doble salida de monitores mirar la validacion de este campo
+
+        res.render('./user/course', {
+            course,
+            docente,
+            monitor
+        });
+    } catch (error) {
+        res.send('Errores no vergas');
+    }
+
 });
 
 module.exports = router;
