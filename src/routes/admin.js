@@ -53,7 +53,6 @@ router.get('/user/edit/:id', isloggedIn, async(req, res) => {
     } catch (e) {
         res.send(e);
     }
-
 });
 
 router.get('/user/delete/:id', isloggedIn, async(req, res) => {

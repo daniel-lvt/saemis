@@ -1,24 +1,32 @@
-{{!-- creacion de contenido para el foro --}}
-
 <div class="container p-4">
     <div class="row">
-
-        <div class="col-md-4 mx-auto">
+        <div class="col-md-6 mx-auto">
             <div class="card text-center">
                 <div class="card-header">
-                    <h3>Consulta Foro</h3>
+                    {{#each course}}
+                    <h3>Crear Consulta <h3 class="text-uppercase">{{Nombre_materia}}</h3>
+                    </h3>
+                    {{/each}}
                 </div>
                 <div class="card-body">
-                    <form action="/admin/signin" method="POST">
+                    <form action="/user/course/add-forum/{{id}}" method="POST" enctype="application/x-www-form-urlencoded">
                         <div class="form-group">
-                            <input type="text" name="username" placeholder="Username" class="form-control">
+                            <input type="text" name="titulo" placeholder="Titulo" class="form-control" required>
+                            <p class="text-left small">Ingresa un titulo que sea llamativo sobre el tema a tratar</p>
                         </div>
                         <div class="form-group">
-                            <input type="password" name="password" class="form-control" placeholder="Password">
+                            <textarea name="descripcion" class="form-control" placeholder="Descripcion" rows="4"
+                                required></textarea>
+                            <p class="text-left small">Ingresa una descripcion sobre el problema a tratar</p>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <input type="file" name="archivo" id="archivo" class="form-control">
+                            <p class="text-letf small">Puede agregar una imagen para ayudar a entender el problema, no es ogligatorio</p>
                         </div>
                         <div class="from-group">
                             <button class="btn btn-success btn-block">
-                                SignIn
+                                Crear
                             </button>
                         </div>
                     </form>
