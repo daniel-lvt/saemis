@@ -33,20 +33,26 @@
     <table class="table" id="id_user">
         <thead>
             <tr>
-                <th scope="col">Aporte</th>
-                <th scope="col">Titulo</th>
-                <th scope="col">Descripcion</th>
-                <th scope="col">Numero Comentarios</th>
-                <th scope="col">Fecha de publicacion</th>
+                <th scope="col" class="small">Aporte</th>
+                <th scope="col" class="small">Titulo</th>
+                <th scope="col" class="small">Descripcion</th>
+                <th scope="col" class="small">Numero Comentarios</th>
+                <th scope="col" class="small">Fecha de publicacion</th>
             </tr>
         </thead>
         <tbody>
             {{#each foro}}
-            <td>{{Usuario_Codigo}}</td>
-            <td>{{title}}</td>
-            <td>{{Descripcion}}</td>
-            <td>0</td>
-            <td>{{timeago fechaPublicacion}}</td>
+            <tr>
+                <td class="small">{{Usuario_Codigo}}</td>
+                <td class="small">
+                    <a href="/user/course/forum/{{idForo}}">
+                        {{title}}
+                    </a>
+                </td>
+                <td class="small">{{Descripcion}}</td>
+                <td class="small">0</td>
+                <td class="small">{{timeago fechaPublicacion}}</td>
+            </tr>
             {{/each}}
         </tbody>
     </table>

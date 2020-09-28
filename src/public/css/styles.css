@@ -56,3 +56,8 @@ body {
     height: 800px;
     overflow-y: scroll;
 }
+
+.fci {
+    background: #E9E2D1;
+    border-radius: 150rem 150rem 150rem;
+}

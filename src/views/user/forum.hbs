@@ -1,0 +1,81 @@
+<div class="sty ">
+    <div class="container-fluid p-4">
+        <div class="row ">
+            <div class="col-md themed-grid-col fc">
+                {{#each dataforum}}
+
+                <h4 class="text-uppercase p-2">{{title}}</h4>
+                <address>
+                    <p>{{Descripcion}}</p>
+                </address>
+                <em class="float-right small footer p-2">{{timeago fechaPublicacion}}</em><br>
+                {{/each}}
+                {{#each docente}}
+                <address>
+                    <em>Docente : {{Nombre_usuario}} - correo : {{Correo_usuario}}</em>
+                </address>
+                {{/each}}
+                {{#each monitor}}
+                <address>
+                    <em>Monitor : {{Nombre_usuario}} - correo : {{Correo_usuario}}</em>
+                </address>
+                {{/each}}
+            </div>
+
+            <div class="col-6 col-md-4 themed-grid-col fci">
+                <div class="row justify-content-center alighn-items-center p-4">
+                    salida por aca
+                    {{#each course}}
+                    <a href="/user/course/add-forum/{{idMateria}}" class="btn btn-outline-info " role="button"
+                        aria-pressed="true">Agregar
+                        Nuevo
+                        Tema</a>
+                    {{/each}}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <form action="/user/course/forum/add-comment/{{id}}" method="post">
+            <div class="container fc">
+                <small>usuario actual : {{Nombre_usuario}}</small>
+                <textarea name="comentario" id="" class="form-control" cols="30" rows="2" required></textarea>
+                <div class="row">
+                    <div class=" p-2 ml-auto">
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block">Comentar</button>
+                        </div>
+                    </div>
+                    <em class="justify-content-rigth alighn-items-rigth p-2 minh-100 ">
+
+                    </em>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container p-4">
+        <h4>Comentarios</h4>
+
+        {{#each contenidoforo}}
+        <div class="card ">
+
+            <div class="card-body">
+                <blockquote class="blockquote mb-0 small">
+                    <p class="small">Comentario</p>
+                    <footer class="blockquote-footer float-right small">
+                        <cite>Un usuario sin verguenza</cite>
+                        <cite title="Source Title" class="small">{{timeago fecha_Comentario}}</cite>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+        {{/each}}
+
+    </div>
+</div>
+
+
+{{> footer}}
