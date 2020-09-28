@@ -165,34 +165,40 @@ router.get('/course/delete/:id', async(req, res) => {
 });
 
 router.get('/course/edit/:id', async(req, res) => {
-    const carrera = req.user.Carrera_idCarrera;
-    const { id } = req.params;
-    const data = await pool.query(`SELECT * FROM materia WHERE idMateria = ${id} and Carrera_idCarrera = ${carrera}`);
-    res.render('./admin/course_edit', {
-        data
-    });
+    try {
+        const carrera = req.user.Carrera_idCarrera;
+        const { id } = req.params;
+        const data = await pool.query(`SELECT * FROM materia WHERE idMateria = ${id} and Carrera_idCarrera = ${carrera}`);
+        res.render('./admin/course_edit', {
+            data
+        });
+    } catch (error) {
+        res.send(req.statusCode)
+    }
 });
 
 router.post('/course/edit/:id', async(req, res) => {
-    const { id } = req.params;
-    const { name, group } = req.body;
-    const data = await pool.query('SELECT * FROM materia WHERE idMateria = ? ', [id]);
-
-    if (data[0].Nombre_materia != name && data[0].Grupo_materia != group) {
-        const update = await pool.query(`UPDATE materia SET Nombre_materia='${name}',Grupo_materia='${group}'  WHERE idMateria=${id}`);
-        req.flash('success', 'Se ha actualizado nombre y grupo satisfactoriamente');
+    try {
+        const { id } = req.params;
+        const { name, group } = req.body;
+        const data = await pool.query('SELECT * FROM materia WHERE idMateria = ? ', [id]);
+        if (data[0].Nombre_materia != name && data[0].Grupo_materia != group) {
+            const update = await pool.query(`UPDATE materia SET Nombre_materia='${name}',Grupo_materia='${group}'  WHERE idMateria=${id}`);
+            req.flash('success', 'Se ha actualizado nombre y grupo satisfactoriamente');
+            res.redirect('/admin/course');
+        } else if (data[0].Nombre_materia == name && data[0].Grupo_materia != group) {
+            const update = await pool.query(`UPDATE materia SET Grupo_materia='${group}'  WHERE idMateria=${id}`);
+            req.flash('success', 'Se ha actualizado grupo satisfactoriamente');
+            res.redirect('/admin/course');
+        } else if (data[0].Nombre_materia != name && data[0].Grupo_materia == group) {
+            const update = await pool.query(`UPDATE materia SET Nombre_materia='${name}' WHERE idMateria=${id}`);
+            req.flash('success', 'Se ha actualizado nombre satisfactoriamente');
+            res.redirect('/admin/course');
+        }
         res.redirect('/admin/course');
-    } else if (data[0].Nombre_materia == name && data[0].Grupo_materia != group) {
-        const update = await pool.query(`UPDATE materia SET Grupo_materia='${group}'  WHERE idMateria=${id}`);
-        req.flash('success', 'Se ha actualizado grupo satisfactoriamente');
-        res.redirect('/admin/course');
-    } else if (data[0].Nombre_materia != name && data[0].Grupo_materia == group) {
-        const update = await pool.query(`UPDATE materia SET Nombre_materia='${name}' WHERE idMateria=${id}`);
-        req.flash('success', 'Se ha actualizado nombre satisfactoriamente');
-        res.redirect('/admin/course');
+    } catch (e) {
+        res.send(req.statusCode)
     }
-    console.log(data[0])
-    res.redirect('/admin/course');
 });
 
 

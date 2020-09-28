@@ -11,8 +11,9 @@ router.get('/', async(req, res) => {
     });
 });
 
-router.get('/course/add-forum/:id', async(req, res) => {
-    console.log('entra');
+router.get('/course/add-forum/', async(req, res) => {
+    console.log(req.user);
+    res.render('./user/create_forum');
 });
 
 router.post('/prueba', (req, res) => {
@@ -20,8 +21,7 @@ router.post('/prueba', (req, res) => {
     console.log(req.body);
     console.log('informacion fuera');
     res.redirect('/user');
-
-})
+});
 
 router.get('/course/:id', async(req, res) => {
     const { id } = req.params;
