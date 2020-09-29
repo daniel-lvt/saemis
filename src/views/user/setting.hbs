@@ -1,5 +1,4 @@
 {{!-- falta crear la validacion y cambio con la base de datos y el redirect --}}
-
 <div class="accordion" id="accordionExample">
     <div class="card">
         <div class="card-header" id="headingOne">
@@ -12,12 +11,13 @@
         </div>
         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
             <div class="card-body">
+
                 <div class="container p-4">
                     <div class="row">
                         <div class="col-md-4 mx-auto">
                             <div class="card ">
                                 <div class="card-body">
-                                    <form action="/admin/password" method="POST">
+                                    <form action="/user/password" method="POST">
                                         <div class="form-group">
                                             <input type="password" class="form-control" name="current_password"
                                                 placeholder="current password" autofocus>
@@ -45,5 +45,6 @@
         </div>
     </div>
 </div>
+
 
 {{> footer}}

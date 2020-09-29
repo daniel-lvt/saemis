@@ -1,12 +1,12 @@
-<div class="sty ">
+<div>
     <div class="container-fluid p-4">
         <div class="row ">
-            <div class="col-md themed-grid-col fc">
+            <div class="col-md themed-grid-col ">
                 {{#each dataforum}}
 
                 <h4 class="text-uppercase p-2">{{title}}</h4>
                 <address>
-                    <p>{{Descripcion}}</p>
+                    <small class="m-2"> <small class="h6">Problema :</small> {{Descripcion}}</small>
                 </address>
                 <em class="float-right small footer p-2">{{timeago fechaPublicacion}}</em><br>
                 {{/each}}
@@ -23,8 +23,21 @@
             </div>
 
             <div class="col-6 col-md-4 themed-grid-col fci">
-                <div class="row justify-content-center alighn-items-center p-4">
-                    salida por aca
+                <div class="row alighn-items-center p-4">
+                    <em class="justify-content-left alighn-items-rigth p-2 minh-100 ">
+                        {{#each usuario}}
+                        <em class="float small">Publicacion creada por: {{Nombre_usuario}}</em>
+                        {{/each}}
+
+                    </em>
+                    {{#each materia}}
+                    <em class="float small p-2">{{Nombre_materia}} {{Grupo_materia}}</em>
+                    {{/each}}
+
+                    {{#each carrera}}
+                    <em class="float small p-2">{{Descripcion_carrera}}</em>
+                    {{/each}}
+
                     {{#each course}}
                     <a href="/user/course/add-forum/{{idMateria}}" class="btn btn-outline-info " role="button"
                         aria-pressed="true">Agregar
@@ -37,45 +50,42 @@
         </div>
     </div>
 
+    <hr width="90%">
+
     <div class="container">
         <form action="/user/course/forum/add-comment/{{id}}" method="post">
-            <div class="container fc">
+            <div class="container ">
                 <small>usuario actual : {{Nombre_usuario}}</small>
                 <textarea name="comentario" id="" class="form-control" cols="30" rows="2" required></textarea>
                 <div class="row">
-                    <div class=" p-2 ml-auto">
+                    <div class=" p-4 ml-auto">
                         <div class="form-group">
                             <button class="btn btn-success btn-block">Comentar</button>
                         </div>
                     </div>
-                    <em class="justify-content-rigth alighn-items-rigth p-2 minh-100 ">
-
-                    </em>
                 </div>
             </div>
         </form>
     </div>
-
-    <div class="container p-4">
+    <div class="container">
         <h4>Comentarios</h4>
 
         {{#each contenidoforo}}
         <div class="card ">
-
             <div class="card-body">
                 <blockquote class="blockquote mb-0 small">
-                    <p class="small">Comentario</p>
+                    <small class="small">{{Comentario}},</small>
                     <footer class="blockquote-footer float-right small">
-                        <cite>Un usuario sin verguenza</cite>
+                        <cite class="small">{{Nombre_usuario}},</cite>
                         <cite title="Source Title" class="small">{{timeago fecha_Comentario}}</cite>
                     </footer>
                 </blockquote>
+                <cite class="small float-right">{{Nombre_tipo}}</cite>
             </div>
         </div>
         {{/each}}
 
     </div>
 </div>
-
 
 {{> footer}}

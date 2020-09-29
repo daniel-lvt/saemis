@@ -82,7 +82,7 @@ router.post('/password', isloggedIn, async(req, res) => {
                 req.flash('success', 'la contraseña ha sido actualizada');
                 res.redirect('/root/setting');
             } else {
-                req.flash('success', 'la contraseña digitada no es valida por favor ingrese de nuevo los datos');
+                req.flash('message', 'la contraseña digitada no es valida por favor ingrese de nuevo los datos');
                 res.redirect('/root/setting');
             }
         }

@@ -1,16 +1,29 @@
 <nav class="navbar navbar-expand-lg navbar-dark cu">
-    <a class="navbar-brand" href="/user/">SAEMIS - ESTUDIANTE</a>
+    <small class="navbar text-light">SAEMIS - ESTUDIANTE</small>
+    {{!-- <a class="navbar-brand" >SAEMIS - ESTUDIANTE</a> --}}
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav mr-auto">
-
-            {{!-- <li class="nav-item">
-                <a class="nav-link" href="/admin/user">Usuarios</a>
+            <li class="nav-item mr-2">
+                <a href="/user/" class="nav-link ">
+                    <div class="row">
+                        <img src="/img/icons/home-24px.svg">
+                        Inicio
+                    </div>
+                </a>
             </li>
-
+            <li class="nav-item ml-4">
+                <a class="nav-link" href="/user/setting">
+                    <div class="row">
+                        <img src="/img/icons/settings-24px.svg" alt="">
+                        Configuracion
+                    </div>
+                </a>
+            </li>
+            {{!-- 
             <li class="nav-item">
                 <a class="nav-link" href="/admin/course">Cursos</a>
             </li>
@@ -21,8 +34,14 @@
                 <a href="/admin/setting" class="nav-link">Configuracion</a>
             </li> --}}
         </ul>
-        <span class="navbar-text">
-            <a href="/logout" class="nav-item">Salir</a>
+        <span class="navbar ">
+            <a href="/logout" class="nav-item">
+                <div class="row text-light">
+                    <img src="/img/icons/login-24px.svg">
+                    Salir
+                </div>
+
+            </a>
         </span>
     </div>
 </nav>

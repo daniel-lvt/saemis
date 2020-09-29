@@ -61,3 +61,9 @@ body {
     background: #E9E2D1;
     border-radius: 150rem 150rem 150rem;
 }
+
+@media screen and (max-width:700px) {
+    .fci {
+        display: none;
+    }
+}

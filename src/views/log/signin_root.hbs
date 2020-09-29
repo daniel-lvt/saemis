@@ -11,7 +11,7 @@
                     <img src="/img/icons/user.svg" alt="logo" class="card-img-top mx-auto m-2 rounded-circle w-50">
                     <form action="/root/signin" method="POST">
                         <div class="form-group">
-                            <input type="text" name="username" placeholder="Username" class="form-control">
+                            <input type="text" name="username" placeholder="Username" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <input type="password" name="password" class="form-control" placeholder="Password">
@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    {{!-- <div class="row">
         <div class="col-md-4 mx-auto">
             <div class="card text-center">
                 <div class="card-header">
@@ -49,7 +49,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 {{> footer}}
