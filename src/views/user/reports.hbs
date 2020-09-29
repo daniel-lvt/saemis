@@ -1,0 +1,64 @@
+<div class="container p-2">
+    <div class="accordion" id="accordionExample">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                        data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Report
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div class="card-body ">
+                    {{!-- opciones para descargar --}}
+                    <div class="container-sm">
+                        <form action="/admin/data/report/info" method="post">
+                            <div class="row">
+                                <div class="container">
+                                    <h6 class="alert alert-info ">Informacion <p class="text-danger">Informacion
+                                            contenida</p>
+                                    </h6>
+                                    <select class="custom-select  mb-4" name="option_tipo">
+                                        <option id="1">Estudiantes</option>
+                                        <option id="2">Monitores</option>
+                                        <option id="3">Docentes</option>
+                                        <option id="4">Materias</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-block">Generar Informe</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col form-group">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="form-group">
+                        <form action="/admin/data/upload" method="POST" enctype="multipart/form-data">
+                            <input type="file" name="file"
+                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-Excel"
+                                class="btn btn-primary">
+                            <p class="help-block">Selecciona un archivo tipo <span class="text-info">.xlsx .xlsm .xltm
+                                    .xltx .xltm .xlam
+                                    .xlsb</span></p>
+                            <p class="text-danger bg-warning p-2">Esta accion borrara todos los usuarios actuales
+                                pertenecientes a la
+                                carrera</p>
+                            <button class="btn btn-warning">Cargar Usuarios</button>
+                        </form>
+                        
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{> footer}}

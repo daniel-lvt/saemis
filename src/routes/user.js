@@ -6,9 +6,14 @@ const helpers = require('../lib/helpers');
 router.get('/', async(req, res) => {
     const id_user = req.user.Codigo;
     const cursos = await pool.query(`select Materia_idMateria,Nombre_materia,Grupo_materia from contenidocurso c join materia m where m.idMateria=c.Materia_idMateria and Usuario_Codigo=${id_user}`);
+
     res.render('./user/user', {
         cursos,
     });
+});
+
+router.get('/report', async(req, res) => {
+    res.render('./user/reports')
 });
 
 router.get('/course/add-forum/:id', async(req, res) => {
@@ -38,7 +43,6 @@ router.post('/course/add-forum/:id', async(req, res) => {
     const data = await pool.query('insert into foro set?', [newForo]);
     res.redirect(`/user/course/${id}`);
 });
-
 
 router.post('/prueba', (req, res) => {
     console.log('informacion dentro');
