@@ -13,19 +13,16 @@
                 <div class="card-body ">
                     {{!-- opciones para descargar --}}
                     <div class="container-sm">
-                        <form action="/admin/data/report/info" method="post">
+                        <form action="/user/setting/report/" method="post">
                             <div class="row">
                                 <div class="container">
                                     <h6 class="alert alert-info ">Informacion <p class="text-danger">Informacion
                                             contenida</p>
                                     </h6>
                                     <select class="custom-select  mb-4" name="option_tipo">
-                                        <option id="1">Estudiantes</option>
-                                        <option id="2">Monitores</option>
-                                        <option id="3">Docentes</option>
-                                        <option id="4">Materias</option>
+                                        <option id="1">Participacion</option>
                                     </select>
-                                    <button class="btn btn-primary btn-block">Generar Informe</button>
+                                    <button class="btn btn-primary btn-block">Generar Informe</button> 
                                 </div>
                             </div>
                         </form>

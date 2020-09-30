@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/database');
 const helpers = require('../lib/helpers');
+const { createPDF } = require('../lib/pdf');
 
 router.get('/', async(req, res) => {
     const id_user = req.user.Codigo;
@@ -72,27 +73,28 @@ router.get('/course/:id', async(req, res) => {
 
 router.post('/course/forum/add-comment/:id', async(req, res) => {
     try {
-        let value = 0;
         const { id } = req.params;
         const { Codigo, Carrera_idCarrera, Tipo_idTipo } = req.user;
         const { comentario } = req.body;
+        const infoForo = await pool.query(`select * from foro where idForo=${id}`);
         const newCommentforo = {
-            Comentario: comentario
+            comentario
         }
-        const data = await pool.query('insert into contenidoforo set?', [newCommentforo]);
-        const cantidad = await pool.query('select max(ContenidoForoid) as n from contenidoforo');
-        value = cantidad[0].n;
-        console.log(value);
-        const newComment = await pool.query('insert into comentarios (Foro_idForo,Foro_Usuario_Codigo,Foro_Usuario_Carrera_idCarrera,Foro_Usuario_Tipo_idTipo,ContenidoForo_ContenidoForoid) values(?,?,?,?,?)', [Number(id), Codigo, Carrera_idCarrera, Tipo_idTipo, 45]);
-        // console.log(newComment)
-        // res.redirect(`/user/course/forum/${id}`);
-        // const newComment = {
-        //     Foro_idForo: Number(id),
-        //     Foro_Usuario_Codigo: Codigo,
-        //     Foro_Usuario_Carrera_idCarrera: Carrera_idCarrera,
-        //     Foro_Usuario_Tipo_idTipo: Tipo_idTipo,
-        //     ContenidoForo_ContenidoForoid: c
-        // };
+        const data = await pool.query('insert into comentario set?', [newCommentforo]);
+        console.log(data)
+        const dataforo = {
+            Usuario_Codigo: Codigo,
+            Usuario_Carrera_idCarrera: Carrera_idCarrera,
+            Usuario_Tipo_idTipo: Tipo_idTipo,
+            Foro_idForo: id,
+            Foro_Usuario_Codigo: infoForo[0].Usuario_Codigo,
+            Foro_Usuario_Carrera_idCarrera: infoForo[0].Usuario_Carrera_idCarrera,
+            Foro_Usuario_Tipo_idTipo: infoForo[0].Usuario_Tipo_idTipo,
+            comentario_idcomentario: data.insertId
+        }
+        const entradaforo = await pool.query('insert into usuario_has_foro set?', [dataforo]);
+        req.flash('success', 'Un nuevo comentario ha sido agregado')
+        res.redirect(`/user/course/forum/${id}`);
     } catch (error) {
         console.log(error)
     }
@@ -108,8 +110,7 @@ router.get('/course/forum/:id', async(req, res) => {
         const usuario = await pool.query(`select Nombre_usuario from usuario where Codigo=${Usuario_Codigo}`);
         const carrera = await pool.query(`select Descripcion_carrera from carrera where idCarrera=${Usuario_Carrera_idCarrera}`);
         const tipoUsuario = await pool.query(`select Nombre_tipo from tipo where idTipo=${Usuario_Tipo_idTipo}`);
-        // const contenidoforo = await pool.query(`select * from contenidoforo where Foro_idForo=${Number(id)}`);
-        // const contenidoforo = await pool.query(`select c.ContenidoForoid,t.Nombre_tipo,u.Nombre_usuario,c.Comentario,c.fecha_Comentario from contenidoforo c, usuario u, tipo t where t.idTipo=c.Foro_Usuario_Tipo_idTipo and u.Codigo=c.Foro_Usuario_Codigo and c.Foro_idForo=${Number(id)}`);
+        const comentariosforo = await pool.query(`select u.Nombre_usuario,c.comentario,c.fecha_comentario,t.Nombre_tipo from usuario_has_foro uf, usuario u, tipo t, comentario c where uf.Usuario_Codigo=u.Codigo and c.idcomentario=uf.comentario_idcomentario and t.idTipo=uf.Usuario_Tipo_idTipo and uf.Foro_idForo=${id}`);
         res.render('./user/forum', {
             dataforum,
             materia,
@@ -117,7 +118,7 @@ router.get('/course/forum/:id', async(req, res) => {
             carrera,
             tipoUsuario,
             Nombre_usuario,
-            // contenidoforo,
+            comentariosforo,
             id
         });
     } catch (err) {
@@ -126,6 +127,29 @@ router.get('/course/forum/:id', async(req, res) => {
 });
 router.get('/setting', (req, res) => {
     res.render('./user/setting');
+});
+router.post('/setting/report/', async(req, res) => {
+    const { option_tipo } = req.body;
+    const { Codigo } = req.user;
+
+    const infoPDF = (out, tipo) => {
+        const pdfDoc = pdfMake.createPdf(out);
+        pdfDoc.getBase64((da) => {
+            res.writeHead(200, {
+                'Content-Type': 'application/dpf',
+                'Content-Disposition': `attachment;filename="${tipo}-${Date.now()}.pdf"`
+            });
+            const download = Buffer.from(da.toString('utf-8'), 'base64');
+            res.end(download);
+        });
+    }
+
+    if (option_tipo === 'Participacion') {
+        //revisar el flujo de la informacion en llegada 
+        const data = await createPDF(Codigo, 5, 'participacion');
+        infoPDF(data, 'participacion');
+    }
+
 });
 
 router.post('/password', async(req, res) => {

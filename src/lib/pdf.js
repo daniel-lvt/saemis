@@ -63,8 +63,47 @@ const createPDF = async(id_carrera, id_busqueda, valor_reporte) => {
             styles: st
         }
         return structDocument;
+    } else if (id_busqueda === 5) {
+        const data = await pool.query(`select Materia_idMateria,Nombre_materia,Grupo_materia from contenidocurso c join materia m where m.idMateria=c.Materia_idMateria and Usuario_Codigo=${id_carrera}`);
+        const infotable = tableReport(data);
+        const structDocument = {
+            content: [
+                { text: `Reporte ${valor_reporte}`, style: 'header' },
+                { text: `Informe de Cursos del usuario con codigo ${id_carrera}`, sontSize: 12, bold: true, margin: [0, 20, 0, 8] },
+                {
+                    table: {
+                        headerRows: 1,
+                        body: infotable
+                    },
+                    layout: 'lightHorizontalLines'
+                }
+            ],
+            footer: {
+                columns: [
+                    { text: 'La informacion suministrada en el presente documento esta ligada al contenido que se encuentra almacenado en el  Sistema de Apoyo de Monitorias, SAEMIS', style: 'small' },
+                    { text: `Informacion generada`, style: 'small' }
+                ]
+            },
+            styles: st
+        };
+        return structDocument;
+
     }
 }
+
+const tableReport = (input) => {
+    const info = []
+    info.push([{ text: '#', style: 'tableHeader' }, { text: '#', style: 'nombre grupo' }, { text: '#', style: 'grupo' }]);
+    let idx = 1;
+    for (i of input) {
+        const { Nombre_materia, Grupo_materia } = i;
+        info.push([idx, Nombre_materia, Grupo_materia]);
+        idx += 1;
+    }
+    return info;
+}
+
+
 
 const table = (input) => {
     const info = [];
